@@ -6,7 +6,7 @@ subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh
 yum update -y
 subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-7-server-satellite-6.1-rpms
 yum erase -y ntp ntpdate
-yum install chrony
+yum install chrony -y
 systemctl enable chronyd
 systemctl start chronyd
 yum -y install katello

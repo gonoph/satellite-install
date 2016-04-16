@@ -1,0 +1,4 @@
+PARTLABEL=var                   /var                    xfs     defaults        0 0
+PARTLABEL=mongodb               /var/lib/mongodb        xfs     defaults,noatime,logbufs=8,logbsize=256k,nobarrier      0 0
+
+zfs1:/ext/pulp-repos/sat2       /var/lib/pulp           nfs     defaults,sec=sys,nfsvers=4.1 0 0

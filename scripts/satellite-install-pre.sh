@@ -9,7 +9,6 @@ yum erase -y ntp ntpdate
 yum install chrony -y
 systemctl enable chronyd
 systemctl start chronyd
-yum -y install katello
 firewall-cmd --add-port="53/udp" --add-port="53/tcp" \
  --add-port="67/udp" --add-port="68/udp" \
  --add-port="69/udp" --add-port="80/tcp" \

@@ -1,7 +1,5 @@
 #!/bin/sh
 
-yum -y install katello-installer
-
 katello-installer \
   --foreman-admin-email=biholmes@redhat.com \
   --foreman-admin-first-name=Billy \

@@ -7,7 +7,7 @@ subscription-manager release --set=7Server
 subscription-manager repos --disable "*"
 subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms
 yum update -y
-subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-7-server-satellite-6.1-rpms
+subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-server-7-satellite-6-beta-rpms
 yum erase -y ntp ntpdate
 yum install chrony -y
 systemctl enable chronyd

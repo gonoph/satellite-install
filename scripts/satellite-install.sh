@@ -5,6 +5,7 @@ beta_install() {
     --foreman-admin-username admin \
     --foreman-admin-password redhat123 \
     --capsule-puppet true \
+    --foreman-proxy-puppetca true \
     --foreman-proxy-tftp true \
     --foreman-admin-email biholmes@redhat.com \
     --foreman-admin-first-name Billy \

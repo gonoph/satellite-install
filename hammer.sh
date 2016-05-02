@@ -21,7 +21,7 @@ function hammer_enable() {
 case $1 in
 	--help|-h)
 		cat<<EOF
-usage: $0 (all | -h | --help | repos | repos-extra | sync | view)
+usage: $0 (all | -h | --help | repos | satellite | repos-extra | sync | view | publish)
 EOF
 	exit 1
 	;;

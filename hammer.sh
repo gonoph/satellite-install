@@ -48,6 +48,14 @@ hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Enterprise Linux
 hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Satellite Tools 6.1 (for RHEL 7 Server) (RPMs)'
 fi
 
+if [ "$SECTION" = "all" -o "$SECTION" = "satellite" ] ; then
+RELEASE=""
+PRODUCT='--product=Red Hat Satellite'
+hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Satellite 6.1 (for RHEL 7 Server) (RPMs)'
+PRODUCT='--product=Red Hat Satellite 6 Beta'
+hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Satellite 6 Beta (for RHEL 7 Server) (RPMs)'
+fi
+
 ## Add more repos and products
 ORG="--organization-id=1"
 
@@ -79,6 +87,8 @@ hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Red Hat Enterprise 
 hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Forge'
 hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='EPEL'
 hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Fedora'
+hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Red Hat Satellite'
+hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Red Hat Satellite 6 Beta'
 fi
 
 if [ "$SECTION" = "all" -o "$SECTION" = "view" ] ; then
@@ -88,4 +98,6 @@ for i in $(hammer --csv repository list ${ORG} | awk -F, {'print $1'} | grep -vi
 	hammer content-view add-repository --name='rhel-7-server-x86_64-cv' ${ORG} --repository-id=${i}
 done
 fi
+if [ "$SECTION" = "all" -o "$SECTION" = "publish" ] ; then
 hammer content-view publish --name="rhel-7-server-x86_64-cv" ${ORG} --async
+fi

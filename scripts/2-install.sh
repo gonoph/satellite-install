@@ -9,8 +9,9 @@ beta_install() {
     --foreman-proxy-tftp true \
     --foreman-admin-email biholmes@redhat.com \
     --foreman-admin-first-name Billy \
-    --foreman-admin-last-name Holmes
-    #--capsule-puppet-ca-proxy true \
+    --foreman-admin-last-name Holmes \
+    --foreman-initial-location Home \
+    --foreman-initial-organization Test62
 }
 
 release_install() {

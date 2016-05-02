@@ -79,7 +79,7 @@ fi
 ORG="--organization-id=1"
 
 if [ "$SECTION" = "all" -o "$SECTION" = "sync" ]; then
-hammer sync-plan create --interval=daily --name='Daily sync' ${ORG} --enabled=yes
+hammer sync-plan create --interval=daily --name='Daily sync' ${ORG} --enabled=yes --sync-date=$(date +%Y-%m-%d)
 hammer sync-plan list ${ORG}
 
 ## add stuff to the sync plan

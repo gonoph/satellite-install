@@ -18,7 +18,10 @@ function hammer_enable() {
 	hammer repository-set enable "${ORG}" "${PRODUCT}" $ARGS --name="$NAME"
 }
 
-case $1 in
+SECTION=$1
+: ${SECTION:=-h}
+
+case $SECTION in
 	--help|-h)
 		cat<<EOF
 usage: $0 (all | -h | --help | repos | satellite | repos-extra | sync | view | publish)
@@ -26,9 +29,6 @@ EOF
 	exit 1
 	;;
 esac
-
-SECTION=$1
-: ${SECTION:=all}
 
 ## RHEL Repos
 PRODUCT='--product=Red Hat Enterprise Linux Server'

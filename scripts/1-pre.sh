@@ -15,7 +15,7 @@ firewall-cmd --add-port="53/udp" --add-port="53/tcp" \
  --add-port="67/udp" --add-port="68/udp" \
  --add-port="69/udp" --add-port="80/tcp" \
  --add-port="443/tcp" --add-port="5647/tcp" \
- --add-port="8140/tcp" \
+ --add-port="8140/tcp"
 firewall-cmd --permanent --add-port="53/udp" --add-port="53/tcp" \
  --add-port="67/udp" --add-port="68/udp" \
  --add-port="69/udp" --add-port="80/tcp" \

@@ -8,6 +8,7 @@ beta_install() {
     --capsule-puppet true \
     --foreman-proxy-puppetca true \
     --foreman-proxy-tftp true \
+    --enable-foreman-plugin-discovery \
     --foreman-initial-location Home \
     --foreman-initial-organization Test62
 }

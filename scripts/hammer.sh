@@ -114,18 +114,20 @@ if [ "$SECTION" = "all" -o "$SECTION" = "repos-extra" ] ; then
   hammer product create ${ORG} --name='Forge'
   hammer repository create ${ORG} --name='Puppet Forge' --product='Forge' --content-type='puppet' --publish-via-http=true --url=https://forge.puppetlabs.com
 
-  info "Enabling extra EPEL repos"
-  hammer product create ${ORG} --name='EPEL'
-  hammer repository create ${ORG} --name='EPEL 7 - x86_64' --product='EPEL' --content-type='yum' --publish-via-http=true --url=http://dl.fedoraproject.org/pub/epel/7/x86_64/
+  if [ -z "$BETA" ] ; then
+    info "Enabling extra EPEL repos"
+    hammer product create ${ORG} --name='EPEL'
+    hammer repository create ${ORG} --name='EPEL 7 - x86_64' --product='EPEL' --content-type='yum' --publish-via-http=true --url=http://dl.fedoraproject.org/pub/epel/7/x86_64/
 
-  info "Enabling extra Fedora 22,23 repos"
-  hammer product create ${ORG} --name='Fedora'
-  hammer repository create ${ORG} --name='Fedora 22 - x86_64' --product='Fedora' --content-type='yum' --publish-via-http=true --url=http://dl.fedoraproject.org/pub/fedora/linux/releases/22/Everything/x86_64/os/
-  hammer repository create ${ORG} --name='Fedora 23 - x86_64' --product='Fedora' --content-type='yum' --publish-via-http=true --url=http://dl.fedoraproject.org/pub/fedora/linux/releases/23/Everything/x86_64/os/
+    info "Enabling extra Fedora 22,23 repos"
+    hammer product create ${ORG} --name='Fedora'
+    hammer repository create ${ORG} --name='Fedora 22 - x86_64' --product='Fedora' --content-type='yum' --publish-via-http=true --url=http://dl.fedoraproject.org/pub/fedora/linux/releases/22/Everything/x86_64/os/
+    hammer repository create ${ORG} --name='Fedora 23 - x86_64' --product='Fedora' --content-type='yum' --publish-via-http=true --url=http://dl.fedoraproject.org/pub/fedora/linux/releases/23/Everything/x86_64/os/
 
-  info "Enabling extra Fedora 22,23 update repos"
-  hammer repository create ${ORG} --name='Fedora 22 Updates - x86_64' --product='Fedora' --content-type='yum' --publish-via-http=true --url=http://dl.fedoraproject.org/pub/fedora/linux/updates/22/x86_64/
-  hammer repository create ${ORG} --name='Fedora 23 Updates - x86_64' --product='Fedora' --content-type='yum' --publish-via-http=true --url=http://dl.fedoraproject.org/pub/fedora/linux/updates/23/x86_64/
+    info "Enabling extra Fedora 22,23 update repos"
+    hammer repository create ${ORG} --name='Fedora 22 Updates - x86_64' --product='Fedora' --content-type='yum' --publish-via-http=true --url=http://dl.fedoraproject.org/pub/fedora/linux/updates/22/x86_64/
+    hammer repository create ${ORG} --name='Fedora 23 Updates - x86_64' --product='Fedora' --content-type='yum' --publish-via-http=true --url=http://dl.fedoraproject.org/pub/fedora/linux/updates/23/x86_64/
+  fi
 
 fi
 
@@ -141,18 +143,23 @@ if [ "$SECTION" = "all" -o "$SECTION" = "sync" ]; then
   ## add stuff to the sync plan
   hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Red Hat Enterprise Linux Server'
   hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Forge'
-  hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='EPEL'
-  hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Fedora'
-  hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Red Hat Satellite'
-  hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Red Hat Satellite 6 Beta'
+  if [ -z "$BETA" ] ; then
+    hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='EPEL'
+    hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Fedora'
+    hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Red Hat Satellite'
+  else
+    hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name='Red Hat Satellite 6 Beta'
+  fi
 fi
 
 if [ "$SECTION" = "all" -o "$SECTION" = "view" ] ; then
-  info "Creating content view for rhel 7"
+  PRODUCT="=--product='Red Hat Enterprise Linux Server"
+  info "Creating content view for \e[1;33m$PRODUCT"
   # Create a content view for RHEL 7 server x86_64:
   hammer content-view create --name='rhel-7-server-x86_64-cv' ${ORG}
-  for i in $(hammer --csv repository list ${ORG} | awk -F, {'print $1'} | tail -n +2 ); do
-    hammer content-view add-repository --name='rhel-7-server-x86_64-cv' ${ORG} --repository-id=${i}
+  hammer --csv repository list ${ORG} "${PRODUCT}" | tail -n +2 | while IFS="," read I N P C U ; do
+    info " Attaching \e[1;33m$N"
+    hammer content-view add-repository --name='rhel-7-server-x86_64-cv' ${ORG} --repository-id=${I}
   done
 fi
 

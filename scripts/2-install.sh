@@ -6,6 +6,7 @@
 : ${L:=Home}
 : ${O:=Test62}
 
+[ -n "$BETA" ] && echo -e "\e[1;31mBETA Mode on\e[0m"  || echo -e "\e[1;34mBETA MODE off\e[0m"
 # this is the beta form of the install command
 beta_install() {
   foreman-installer --scenario katello \

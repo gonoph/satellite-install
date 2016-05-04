@@ -2,6 +2,7 @@
 
 : ${BETA:=}
 
+[ -n "$BETA" ] && echo -e "\e[1;31mBETA Mode on\e[0m"  || echo -e "\e[1;34mBETA MODE off\e[0m"
 # make sure if there is an error, we abort
 set -e 
 

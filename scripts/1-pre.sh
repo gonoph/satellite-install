@@ -1,5 +1,7 @@
 #!/bin/sh
 
+: ${BETA:=}
+
 # make sure if there is an error, we abort
 set -e 
 
@@ -12,7 +14,11 @@ subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh
 yum update -y
 
 # add in the satellite repos
-subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-server-7-satellite-6-beta-rpms
+if [ -n "$BETA" ] ; then
+  subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-server-7-satellite-6-beta-rpms
+else
+  subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-server-7-satellite-6.1-rpms
+fi
 
 # setup the time
 yum erase -y ntp ntpdate

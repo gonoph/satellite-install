@@ -2,7 +2,6 @@
 
 : ${BETA:=}
 ORG="--organization-id=1"
-# hammer subscription upload --file /root/manifest_2016-04-15.zip --organization-id 1
 
 ## Enable some repos
 
@@ -22,6 +21,10 @@ info() {
   echo -e "\e[0;34m*\e[32m" "$@" "\e[0m"
 }
 
+warn() {
+  echo -e "\e[1;33mWarning:\e[0;32m" "$@" "\e[0m"
+}
+
 SECTION=$1
 : ${SECTION:=-h}
 
@@ -29,11 +32,37 @@ SECTION=$1
 case $SECTION in
   --help|-h)
     cat<<EOF
-usage: $0 (all | -h | --help | repos | satellite | repos-extra | sync | view | publish | provisioning)
+usage: $0 (manifest (FILE) | all | -h | --help | repos | satellite | repos-extra | sync | view | publish | provisioning)
 EOF
   exit 1
   ;;
 esac
+
+if [ "$SECTION" = "manifest" ] ; then
+  info "Uploading manifest info \e[1;33m$(hostname)"
+  FILE=$2
+  : ${FILE:=/tmp/manifest.zip}
+  while [ ! -r $FILE ] ; do
+    warn "Unable to read: \e[0;33m$FILE"
+    # if it's not interactive then exit
+    [ -n "$2" ] && exit 1
+    read -ep "Path to manifest: " -i "$FILE" FILE
+    if [ "$(basename $FILE .zip)" = "$FILE" ] ; then
+      warn "File doesn't have .zip extension: \e[1;33m$FILE"
+      FILE=$(rev <<< "$FILE" | cut -d . -f 2- | rev)
+    fi
+  done
+  hammer subscription upload --file "$FILE" $ORG --async
+  I=10
+  while [ $I -gt 0 ] ; do
+    hammer subscription list $ORG
+    DONE=$(hammer --csv subscription list --organization-id=1 | tail -n +2)
+    [ -n "$DONE" ] && break
+    I=$[ I - 1 ]
+    sleep 3
+  done
+  exit
+fi
 
 ## RHEL Repos
 PRODUCT='--product=Red Hat Enterprise Linux Server'

@@ -1,6 +1,6 @@
 .PHONY: help install pre-install-only install-only post-install-only clean
 
-BETA?=
+ISBETA?=
 PRE_SCRIPT:=scripts/1-pre.sh
 INSTALL_SCRIPT:=scripts/2-install.sh
 POST_SCRIPT:=scripts/3-post.sh
@@ -30,24 +30,28 @@ install-only: .FORCE_install install
 post-install-only: .FORCE_post-install post-install
 
 $(HAMMER_CONF_INSTALLED): $(HAMMER_CONF)
+	mkdir -p $(shell dirname $@)
 	./$(HAMMER_CONF) > $@
 
 $(BLOCKDEV_CONF_INSTALLED): $(BLOCKDEV_CONF)
-	install -d $(dirname $@)
+	install -d $(shell dirname $@)
 	install $< $@
 
 pre-install: .done_pre-install
-.done_pre-install: $(HAMMER_CONF_INSTALLED) $(BLOCKDEV_CONF_INSTALLED) $(PRE_SCRIPT) BETA=$(BETA)
+.done_pre-install: export BETA = $(ISBETA)
+.done_pre-install: $(HAMMER_CONF_INSTALLED) $(BLOCKDEV_CONF_INSTALLED) $(PRE_SCRIPT)
 	./$(PRE_SCRIPT)
 	touch $@
 
-install: .done_install
-.done_install: $(INSTALL_SCRIPT) BETA=$(BETA)
+install: pre-install .done_install post-install
+.done_install: export BETA = $(ISBETA)
+.done_install: $(INSTALL_SCRIPT)
 	./$(INSTALL_SCRIPT)
 	touch $@
 
 post-install: .done_post-install
-.done_post-install: $(POST_SCRIPT) BETA=$(BETA)
+.done_post-install: export BETA = $(ISBETA)
+.done_post-install: $(POST_SCRIPT)
 	./$(POST_SCRIPT)
 	touch $@
 

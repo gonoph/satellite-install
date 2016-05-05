@@ -20,8 +20,8 @@ If you want to reuse an existing system:
 2) Find the old system, copy it's UUID (ex: ad88c818-7777-4370-8878-2f1315f7177a)
 3) Set these ENV variables:
 
-	RH_OLD_SYSTEM=ad88c818-7777-4370-8878-2f1315f7177a
-	RH_USER=biholmes
+	export RH_OLD_SYSTEM=ad88c818-7777-4370-8878-2f1315f7177a
+	export RH_USER=biholmes
 
 However, if you want to use an activation key, you need to do this:
 
@@ -30,8 +30,8 @@ However, if you want to use an activation key, you need to do this:
 3) Setup an activation key via: https://access.redhat.com/management/activation_keys
 4) Set these ENV variables:
 
-	RH_ACTIVATION_KEY=MY_COOL_KEY
-	RH_ORG_ID=31337
+	export RH_ACTIVATION_KEY=MY_COOL_KEY
+	export RH_ORG_ID=31337
 
 EOF
   exit 1

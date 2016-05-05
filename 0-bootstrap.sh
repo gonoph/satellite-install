@@ -37,7 +37,38 @@ EOF
   exit 1
 }
 
+fix_hostname() {
+  HOST=$(subscription-manager identity | grep ^name: | cut -d ' ' -f 2)
+  if [ "$(hostname)" = "$HOST" ] ; then
+    return
+  fi
+
+  echo "Current hostname and old hostname don't match."
+  echo "Setting current hostname to: $HOST"
+  hostnamectl set-hostname $HOST
+}
+
+fix_ip() {
+  echo "Determining old ip from hostname..."
+  OLDIP=$(ping -w 1 -c 1 $HOST 2>/dev/null | grep ^PING | tr '()' ',' | cut -d , -f 2)
+  if [ -z "$IP" ] ; then
+    echo "Unable to determine old ipaddress"
+    return
+  fi
+  IP_MASK=$(nmcli c show eth0 | grep ipv4.addresses | tr -s ' ' | cut -d ' ' -f 2)
+  MASK=$(cut -d / -f 2 <<< "$OLDIP_MASK")
+  IP=$(cut -d / -f 1 <<< "$OLDIP_MASK")
+  if [ "$IP" = "$OLDIP" ] ; then
+    echo "Old ip and current ip are the same."
+    return
+  fi
+  echo "Old ip and current ip don't match, setting ip to old ip: $OLDIP/$MASK"
+  nmcli c modify ipv4.addresses "$OLDIP/$MASK"
+}
+
 subscription-manager identity || register_system
+fix_hostname
+fix_ip
 subscription-manager release --set=7Server
 subscription-manager repos --disable "*"
 subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms

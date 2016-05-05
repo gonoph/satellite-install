@@ -1,0 +1,5 @@
+            for model in _packages:
+                unit_key = model.unit_key
+                type_id = model._content_type_id
+                url = urljoin(base_url, model.download_path)
+                conduit.add_entry(type_id, unit_key, url)

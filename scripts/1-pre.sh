@@ -40,7 +40,7 @@ firewall-cmd --permanent --add-port="53/udp" --add-port="53/tcp" \
  --add-port="8140/tcp"
 
 # actually install katello / satellite
-yum -y install katello
+yum -y install katello rubygem-smart_proxy_discovery
 
 # make sure the permissions are set in case we mounted special directories
 restorecon -Rv /var

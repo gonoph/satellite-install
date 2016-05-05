@@ -153,7 +153,7 @@ if [ "$SECTION" = "all" -o "$SECTION" = "sync" ]; then
 fi
 
 if [ "$SECTION" = "all" -o "$SECTION" = "view" ] ; then
-  PRODUCT="=--product='Red Hat Enterprise Linux Server"
+  PRODUCT="--product=Red Hat Enterprise Linux Server"
   info "Creating content view for \e[1;33m$PRODUCT"
   # Create a content view for RHEL 7 server x86_64:
   hammer content-view create --name='rhel-7-server-x86_64-cv' ${ORG}
@@ -177,14 +177,18 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
   hammer activation-key create --organization-id=1 --name=RHEL7-BASE --content-view='Default Organization View' --lifecycle-environment=Library --unlimited-content-hosts
 
   info "Provisioning setting: hostgroup"
-  hostgroup create --organization-ids=1 --architecture=x86_64 --domain=$(hostname -d) --environment=production --medium=Test62/Library/Red_Hat_Server/Red_Hat_Enterprise_Linux_7_Server_Kickstart_x86_64_7Server --name=RHEL7-Server --operatingsystem='RedHat 7.2' --partition-table='Kickstart default' --puppet-ca-proxy-id=1 --puppet-proxy-id=1 --subnet=$(hostname -d) --root-pass=redhat123
+  hammer hostgroup create --organization-ids=1 --architecture=x86_64 --domain=$(hostname -d) --environment=production --medium=Test62/Library/Red_Hat_Server/Red_Hat_Enterprise_Linux_7_Server_Kickstart_x86_64_7Server --name=RHEL7-Server --operatingsystem='RedHat 7.2' --partition-table='Kickstart default' --puppet-ca-proxy-id=1 --puppet-proxy-id=1 --subnet=$(hostname -d) --root-pass=redhat123
 
   info "Provisioning setting: adding subscriptions to activation key"
   SUBSCRIPTION_ID=$(hammer --output=csv subscription list --organization-id=1 | awk -F, '/^Employee/ {print $8}')
-  hammer activation-key add-subscription --organization-id=1 --name=RHEL7-BASE --subscription-id=$(SUBSCRIPTION_ID)
+  hammer activation-key add-subscription --organization-id=1 --name=RHEL7-BASE --subscription-id=$SUBSCRIPTION_ID
 
   info "Provisioning setting: adding satellite and common repos to activation key"
-  hammer activation-key content-override --name=RHEL7-BASE --value=1 --organization-id=1 --content-label=rhel-7-server-satellite-tools-6-beta-rpms
+  if [ -n "$BETA" ] ; then
+    hammer activation-key content-override --name=RHEL7-BASE --value=1 --organization-id=1 --content-label=rhel-7-server-satellite-tools-6-beta-rpms
+  else
+    hammer activation-key content-override --name=RHEL7-BASE --value=1 --organization-id=1 --content-label=rhel-7-server-satellite-tools-6.1-rpms
+  fi
   hammer activation-key content-override --name=RHEL7-BASE --value=1 --organization-id=1 --content-label=rhel-7-server-rh-common-rpms
   # hammer activation-key content-override --name=RHEL7-BASE --value=1 --organization-id=1 --content-label=rhel-7-server-rpms
 

@@ -1,5 +1,13 @@
-            for model in _packages:
-                unit_key = model.unit_key
-                type_id = model._content_type_id
-                url = urljoin(base_url, model.download_path)
-                conduit.add_entry(type_id, unit_key, url)
+--- /usr/lib/python2.7/site-packages/pulp_rpm/plugins/catalogers/yum.py	2016-04-19 17:54:46.000000000 -0400
++++ /usr/lib/python2.7/site-packages/pulp_rpm/plugins/catalogers/yum.py.new	2016-05-05 01:15:39.220012053 -0400
+@@ -50,8 +50,9 @@
+                 fp, primary.PACKAGE_TAG, primary.process_package_element)
+             for model in _packages:
+                 unit_key = model.unit_key
++                type_id = model._content_type_id
+                 url = urljoin(base_url, model.download_path)
+-                conduit.add_entry(models.RPM._content_type_id, unit_key, url)
++                conduit.add_entry(type_id, unit_key, url)
+         finally:
+             fp.close()
+ 

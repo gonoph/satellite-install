@@ -40,7 +40,12 @@ firewall-cmd --permanent --add-port="53/udp" --add-port="53/tcp" \
  --add-port="8140/tcp"
 
 # actually install katello / satellite
-yum -y install katello rubygem-smart_proxy_discovery
+yum -y install \
+	katello \
+	rubygem-smart_proxy_discovery \
+	ruby193-rubygem-foreman_discovery \
+	foreman-discovery-image \
+	pulp-admin-client
 
 # make sure the permissions are set in case we mounted special directories
 restorecon -Rv /var

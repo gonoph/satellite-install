@@ -1,14 +1,17 @@
 .PHONY: help install pre-install-only install-only post-install-only clean
 
-ISBETA?=
+BETA?=
 PRE_SCRIPT:=scripts/1-pre.sh
 INSTALL_SCRIPT:=scripts/2-install.sh
 POST_SCRIPT:=scripts/3-post.sh
 CLEAN_SCRIPT:=scripts/0-clean.sh
 HAMMER_CONF:=conf/cli_config.yml.sh
 HAMMER_CONF_INSTALLED:=$(HOME)/.hammer/cli_config.yml
-BLOCKDEV_CONF:=etc/mongod.service.d/blockdev.conf
+BLOCKDEV_CONF:=e/tc/mongod.service.d/blockdev.conf
 BLOCKDEV_CONF_INSTALLED:=/etc/systemd/system/mongod.service.d/blockdev.conf
+PULP_SOURCES:=alternative.conf
+PULP_SOURCES_INSTALLED:=/etc/pulp/content/sources/conf.d/alternative.conf
+PULP_PATCH:=pulp_rpm-plugins-catalogers-yum.patch
 
 help:
 	@echo "Usage: make (help | install | pre-install-only | install-only | post-install-only | clean"
@@ -29,6 +32,11 @@ pre-install-only: .FORCE_pre-install pre-install
 install-only: .FORCE_install install
 post-install-only: .FORCE_post-install post-install
 
+REAL_PATH_PULP_PATCH:=$(shell realpath $(PULP_PATCH))
+$(PULP_SOURCES_INSTALLED): $(PULP_SOURCES) $(PULP_PATCH)
+	cd / ; patch -p0 < $(REAL_PATH_PULP_PATCH)
+	install $(PULP_SOURCES) $@
+
 $(HAMMER_CONF_INSTALLED): $(HAMMER_CONF)
 	mkdir -p $(shell dirname $@)
 	./$(HAMMER_CONF) > $@
@@ -38,20 +46,20 @@ $(BLOCKDEV_CONF_INSTALLED): $(BLOCKDEV_CONF)
 	install $< $@
 
 pre-install: .done_pre-install
-.done_pre-install: export BETA = $(ISBETA)
+.done_pre-install: export BETA
 .done_pre-install: $(HAMMER_CONF_INSTALLED) $(BLOCKDEV_CONF_INSTALLED) $(PRE_SCRIPT)
 	./$(PRE_SCRIPT)
 	touch $@
 
 install: pre-install .done_install post-install
-.done_install: export BETA = $(ISBETA)
+.done_install: export BETA
 .done_install: $(INSTALL_SCRIPT)
 	./$(INSTALL_SCRIPT)
 	touch $@
 
 post-install: .done_post-install
-.done_post-install: export BETA = $(ISBETA)
-.done_post-install: $(POST_SCRIPT)
+.done_post-install: export BETA
+.done_post-install: $(PULP_SOURCES_INSTALLED) $(POST_SCRIPT)
 	./$(POST_SCRIPT)
 	touch $@
 

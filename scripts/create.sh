@@ -29,6 +29,16 @@ warn() {
   echo -e "\e[0;33m""$@""\e[0m"
 }
 
+cmd() {
+  info "Running:\e[1m" "$@"
+  eval "$@" > /tmp/ll
+  info "$(cat /tmp/ll)"
+}
+
+shtml() {
+	sed 's%<[[:alnum:]/]*>%%g' | tr -s ' '
+}
+
 warn "HOST=$HOST"
 warn "NAME=$NAME"
 warn "IP=$IP"
@@ -40,15 +50,18 @@ if [ "x$1" = "xclean" ] ; then
   hammer --csv host list --search name=${HOST} | tail -n +2 | cut -d , -f 1,2 | tr ',' ' ' > /tmp/x
   cat /tmp/x | while read HID H ; do
     info "Deleting $H with --id=$HID"
-    hammer host delete --id=$HID
+    cmd "hammer host delete --id=$HID"
   done
   [ -s /tmp/x ] || info "Didn't find any satellite hosts named $HOST"
 
   HID=$(ovirt /vms/?search=name=$NAME | grep vm.href.*id= | sed 's/^.*id="\(.*\)".*$/\1/' )
   for id in $HID ; do
     info "Deleting $HOST with id=$id"
-    ovirt /vms/$HID/stop -H 'Content-type: application/xml' -d '<action><async>false</async></action>' | grep state
-    ovirt /vms/$HID -X DELETE | grep state
+    cat<< EOF > /tmp/x
+<action><async>false</async></action>
+EOF
+    cmd "ovirt /vms/$HID/stop -H 'Content-type: application/xml' -d @/tmp/x | grep state | shtml"
+    cmd "ovirt /vms/$HID -X DELETE | grep state | shtml"
   done
   [ -z "$HID" ] && info "Didn't find any RHEVM VMs named $NAME"
   exit 1
@@ -86,7 +99,7 @@ while [ $I -gt 0 ] ; do
 	ovirt /vms/$VMS_ID/disks/$DISK_ID | grep state | grep -q ok && break
 	I=$[ $I - 1 ]
 	sleep 1
-	date
+	info "$(date)"
 done
 
 if [ $I -eq 0 ] ; then
@@ -96,22 +109,18 @@ fi
 
 set -e
 
-info "Creating host in foreman: $HOST, mac=$MAC, ip=$IP"
-hammer host create --name=${HOST} \
+info "Creating host in foreman: $HOST, mac=$MAC, ip=$IP, HG=$HG, ORG=$ORG, LOC=$LOCATION"
+cmd "hammer host create --name=${HOST} \
   --hostgroup=$HG \
-  --interface="primary=true, provision=true, mac=${MAC}, ip=$IP" \
+  --interface='primary=true, provision=true, mac=${MAC}, ip=$IP' \
   --organization-id=$ORG \
   --location-id=$LOCATION \
-  --root-password=redhat123
+  --root-password=redhat123"
 # --ask-root-password=yes
 
 
 info "Starting VM to boot from network"
 cat <<EOF > /tmp/x
-<action><vm><os><boot dev="network"/><boot dev="hd"/></os></vm></action>
-EOF
-cat <<EOF > /tmp/x
 <action/>
 EOF
-ovirt /vms/$VMS_ID/start \
--H "Content-type: application/xml" -d @/tmp/x | grep state
+cmd "ovirt /vms/$VMS_ID/start -H 'Content-type: application/xml' -d @/tmp/x | grep state | shtml"

@@ -1,7 +1,10 @@
 #!/bin/sh
 
 : ${BETA:=}
-ORG="--organization-id=1"
+: ${ORG:=1}
+: ${LOC:=2}
+
+ORG="--organization-id=$ORG"
 
 ## Enable some repos
 
@@ -107,7 +110,6 @@ if [ "$SECTION" = "all" -o "$SECTION" = "satellite" ] ; then
 fi
 
 ## Add more repos and products
-ORG="--organization-id=1"
 
 if [ "$SECTION" = "all" -o "$SECTION" = "repos-extra" ] ; then
   info "Enabling extra forge repos"
@@ -132,7 +134,6 @@ if [ "$SECTION" = "all" -o "$SECTION" = "repos-extra" ] ; then
 fi
 
 ## Add a sync plan
-ORG="--organization-id=1"
 
 if [ "$SECTION" = "all" -o "$SECTION" = "sync" ]; then
   info "Creating sync plan for daily syncs"
@@ -170,8 +171,10 @@ fi
 
 if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
   info "Provisioning setting: subnet"
-  DNS=
   hammer subnet create --organization-ids=1 --boot-mode=Static --dns-primary=192.168.26.82 --dns-secondary=192.168.25.10 --name=$(hostname -d) --network=192.168.26.0 --mask=255.255.255.0 --gateway=192.168.26.10 --ipam=None --tftp-id=1
+
+  info "Attaching subnet to Location"
+  hammer location add-subnet --id=$LOC --subnet=$(hostname -d)
 
   info "Provisioning setting: activation-key"
   hammer activation-key create --organization-id=1 --name=RHEL7-BASE --content-view='Default Organization View' --lifecycle-environment=Library --unlimited-content-hosts

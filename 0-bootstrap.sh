@@ -21,17 +21,17 @@ EOF
 }
 
 register_system() {
-  if [ -n "$RH_OLD_SYSTEM" ] && [ -n "$RH_USER" ] ; then
-    subscription-manager register --consumerid=$RH_OLD_SYSTEM --username=$RH_USER
+  if [ -n "$RHN_OLD_SYSTEM" ] && [ -n "$RHN_USER" ] ; then
+    subscription-manager register --consumerid=$RHN_OLD_SYSTEM --username=$RHN_USER
     return
   fi
-  if [ -n "$RH_ACTIVATION_KEY" ] && [ -n $RH_ORG_ID ] ; then
-    subscription-manager register --activationkey=${RH_ACTIVATION_KEY} --org=${RH_ORG_ID}
+  if [ -n "$RHN_ACTIVATION_KEY" ] && [ -n $RHN_ORG_ID ] ; then
+    subscription-manager register --activationkey=${RHN_ACTIVATION_KEY} --org=${RHN_ORG_ID}
     return
   fi
   if [ -n "$RHN_USER" ] && [ -n "$RHN_PASS" ] ; then
     RHN_OLD_SYSTEM=$(python_helper)
-    subscription-manager register --consumerid=$RH_OLD_SYSTEM --username=$RH_USER
+    subscription-manager register --consumerid=$RHN_OLD_SYSTEM --username=$RHN_USER
     return
   fi
   cat<<EOF
@@ -43,8 +43,8 @@ If you want to reuse an existing system:
 2) Find the old system, copy it's UUID (ex: ad88c818-7777-4370-8878-2f1315f7177a)
 3) Set these ENV variables:
 
-	export RH_OLD_SYSTEM=ad88c818-7777-4370-8878-2f1315f7177a
-	export RH_USER=biholmes
+	export RHN_OLD_SYSTEM=ad88c818-7777-4370-8878-2f1315f7177a
+	export RHN_USER=biholmes
 
 4) Or set these environment varibles, and a helper script will do that for you
 
@@ -57,8 +57,8 @@ However, if you want to use an activation key, you need to do this:
 3) Setup an activation key via: https://access.redhat.com/management/activation_keys
 4) Set these ENV variables:
 
-	export RH_ACTIVATION_KEY=MY_COOL_KEY
-	export RH_ORG_ID=31337
+	export RHN_ACTIVATION_KEY=MY_COOL_KEY
+	export RHN_ORG_ID=31337
 
 EOF
   exit 1

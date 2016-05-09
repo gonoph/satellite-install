@@ -10,6 +10,8 @@ HAMMER_CONF:=conf/cli_config.yml.sh
 HAMMER_CONF_INSTALLED:=$(HOME)/.hammer/cli_config.yml
 BLOCKDEV_CONF:=etc/mongod.service.d/blockdev.conf
 BLOCKDEV_CONF_INSTALLED:=/etc/systemd/system/mongod.service.d/blockdev.conf
+SUDOERS_D:=etc/sudoers.d/mongodb
+SUDOERS_D_INSTALLED:=/etc/sudoers.d/mongodb
 PULP_SOURCES:=alternative.conf
 PULP_SOURCES_INSTALLED:=/etc/pulp/content/sources/conf.d/alternative.conf
 PULP_PATCH:=pulp_rpm-plugins-catalogers-yum.patch
@@ -39,8 +41,12 @@ $(PULP_SOURCES_INSTALLED): $(PULP_SOURCES) $(PULP_PATCH)
 	install $(PULP_SOURCES) $@
 
 $(HAMMER_CONF_INSTALLED): $(HAMMER_CONF)
-	mkdir -p $(shell dirname $@)
+	install -d $(shell dirname $@)
 	./$(HAMMER_CONF) > $@
+
+$(SUDOERS_D_INSTALLED): $(SUDOERS_D)
+	install -d $(shell dirname $@)
+	install $< $@
 
 $(BLOCKDEV_CONF_INSTALLED): $(BLOCKDEV_CONF)
 	install -d $(shell dirname $@)

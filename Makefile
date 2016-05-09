@@ -1,6 +1,7 @@
 .PHONY: help install pre-install-only install-only post-install-only clean
 
 BETA?=
+
 PRE_SCRIPT:=scripts/1-pre.sh
 INSTALL_SCRIPT:=scripts/2-install.sh
 POST_SCRIPT:=scripts/3-post.sh
@@ -46,19 +47,25 @@ $(BLOCKDEV_CONF_INSTALLED): $(BLOCKDEV_CONF)
 	install $< $@
 
 pre-install: .done_pre-install
-.done_pre-install: export BETA
+ifdef BETA
+.done_pre-install: export BETA=1
+endif
 .done_pre-install: $(HAMMER_CONF_INSTALLED) $(BLOCKDEV_CONF_INSTALLED) $(PRE_SCRIPT)
 	./$(PRE_SCRIPT)
 	touch $@
 
 install: pre-install .done_install post-install
-.done_install: export BETA
+ifdef BETA
+.done_install: export BETA=1
+endif
 .done_install: $(INSTALL_SCRIPT)
 	./$(INSTALL_SCRIPT)
 	touch $@
 
 post-install: .done_post-install
-.done_post-install: export BETA
+ifdef BETA
+.done_post-install: export BETA=1
+endif
 .done_post-install: $(PULP_SOURCES_INSTALLED) $(POST_SCRIPT)
 	./$(POST_SCRIPT)
 	touch $@

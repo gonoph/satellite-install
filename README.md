@@ -36,15 +36,15 @@ Finally run the script:
 
 After the reboot, you will need to run make to finish setting up the server. My Makefile assumes certain things, which you will need to update:
 
-1) There is a blockdevice called */dev/mapper/rhel_sat--mongodb-mongodb* and it is mounted at */var/lib/mongodb*
-2) You will use the default user/pass of *admin/redhat123*
-3) You pulp alternative sources is located at *http://zfs1.virt/pulp/*
+#) There is a blockdevice called */dev/mapper/rhel_sat--mongodb-mongodb* and it is mounted at */var/lib/mongodb*
+#) You will use the default user/pass of *admin/redhat123*
+#) You pulp alternative sources is located at *http://zfs1.virt/pulp/*
 
 You can change these assumptions by editing these files to suit your needs:
 
-1) conf/cli_config.yml.sh
-2) etc/mongod.service.d/blockdev.conf
-3) alternative.conf
+#) conf/cli_config.yml.sh
+#) etc/mongod.service.d/blockdev.conf
+#) alternative.conf
 
 ### Using the hammer script
 

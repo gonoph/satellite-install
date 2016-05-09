@@ -23,8 +23,8 @@ Now, copy the bootstrap script to your server:
 
 Next, there are two ways to register the server:
 
-1) Activiation Key
-2) Use an existing system
+1. Activiation Key
+2. Use an existing system
 
 To use either option, run the script, and it will tell you which environment settings to set. As a bonus, if you set the hostname beforehand, the script will automatically set the correct IP address for you. This assumes you are using static IPs. If you are using DHCP, then after the ip address is set, the gateway and DNS will be blank.
 
@@ -36,15 +36,15 @@ Finally run the script:
 
 After the reboot, you will need to run make to finish setting up the server. My Makefile assumes certain things, which you will need to update:
 
-#) There is a blockdevice called */dev/mapper/rhel_sat--mongodb-mongodb* and it is mounted at */var/lib/mongodb*
-#) You will use the default user/pass of *admin/redhat123*
-#) You pulp alternative sources is located at *http://zfs1.virt/pulp/*
+1. There is a blockdevice called */dev/mapper/rhel_sat--mongodb-mongodb* and it is mounted at */var/lib/mongodb*
+2. You will use the default user/pass of *admin/redhat123*
+3. You pulp alternative sources is located at *http://zfs1.virt/pulp/*
 
 You can change these assumptions by editing these files to suit your needs:
 
-#) conf/cli_config.yml.sh
-#) etc/mongod.service.d/blockdev.conf
-#) alternative.conf
+1. conf/cli_config.yml.sh
+2. etc/mongod.service.d/blockdev.conf
+3. alternative.conf
 
 ### Using the hammer script
 

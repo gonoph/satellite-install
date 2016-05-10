@@ -126,7 +126,7 @@ subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh
 cat /tmp/l | wc -l
 yum install -y screen git vim
 
-[ -r satellite-install/.git ] || git clone http://git/git/satellite-install.git
+[ -r satellite-install/.git ] || git clone https://github.com/gonoph/satellite-install.git
 
 (
   cd satellite-install

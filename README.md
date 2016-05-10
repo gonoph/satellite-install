@@ -21,10 +21,11 @@ Now, copy the bootstrap script to your server:
 
     scp 0-bootstrap.sh sat-62:/tmp
 
-Next, there are two ways to register the server:
+Next, there are three ways to register the server:
 
 1. Activiation Key
 2. Use an existing system
+3. Use an existing system, but let the script lookup the UUID from the RHN portal
 
 To use either option, run the script, and it will tell you which environment settings to set. As a bonus, if you set the hostname beforehand, the script will automatically set the correct IP address for you. This assumes you are using static IPs. If you are using DHCP, then after the ip address is set, the gateway and DNS will be blank.
 

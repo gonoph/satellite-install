@@ -2,10 +2,14 @@
 
 set -e 
 
+rhn_findorg() {
+    curl -s -u $RHN_USER:$RHN_PASS -k https://subscription.rhn.redhat.com/subscription/users/$RHN_USER/owners | python -mjson.tool | grep '"key"' | cut -d '"' -f 4
+}
+
 # this will pull a list of systems from the Red Hat Portal and attempt to match based on the current hostname
 rhn_helper() {
-    local HREF=$(curl -s -u $RHN_USER:$RHN_PASS -k https://subscription.rhn.redhat.com/subscription/users/$RHN_USER/owners | python -mjson.tool | grep href | cut -d '"' -f 4)
-    if [ -z "$HREF" ] ; then
+    RHN_ORG_ID=$(rhn_findorg)
+    if [ -z "$RHN_ORG_ID" ] ; then
         echo "Unable to lookup owner ID and subscribed systems from RHN using login info for: $RHN_USER" >&2
         exit 1
     fi
@@ -13,7 +17,7 @@ rhn_helper() {
     local MYHN=$(hostname)
     echo "# Trying to match to: $MYHN" 1>&2
     # cycle through the systems and find a match
-    curl -s -u $RHN_USER:$RHN_PASS -k https://subscription.rhn.redhat.com/subscription$HREF/consumers | python -mjson.tool | egrep '^        "(name|uuid)"' | awk '!(NR%2){print$0p}{p=$0}' | cut -d '"' -f 4,8 | tr '"' ' ' | while read UUID HN ; do
+    curl -s -u $RHN_USER:$RHN_PASS -k https://subscription.rhn.redhat.com/subscription/owners/$RHN_ORG_ID/consumers | python -mjson.tool | egrep '^        "(name|uuid)"' | awk '!(NR%2){print$0p}{p=$0}' | cut -d '"' -f 4,8 | tr '"' ' ' | while read UUID HN ; do
         if [ "$HN" = $MYHN ] ; then
             echo "# Found matching host ($HN) with uuid: $UUID" 1>&2
             echo $UUID
@@ -24,24 +28,26 @@ rhn_helper() {
 }
 
 register_system() {
-  if [ -n "$RHN_OLD_SYSTEM" ] && [ -n "$RHN_USER" ] ; then
-    subscription-manager register --consumerid=$RHN_OLD_SYSTEM --username=$RHN_USER
-    return
-  fi
-  if [ -n "$RHN_ACTIVATION_KEY" ] && [ -n $RHN_ORG_ID ] ; then
-    subscription-manager register --activationkey=${RHN_ACTIVATION_KEY} --org=${RHN_ORG_ID}
-    return
-  fi
-  if [ -n "$RHN_USER" ] && [ -n "$RHN_PASS" ] ; then
-    RHN_OLD_SYSTEM=$(rhn_helper)
-    if [ -z "$RHN_OLD_SYSTEM" ] ; then
-        echo "Unable to find UUID for existing subscripbed host with this hostname." >&2
-        exit 1
+    if [ -n "$RHN_ACTIVATION_KEY" ] ; then
+        if [ -z "$RHN_ORG_ID" ] && [ -n "$RHN_USER" ] ; then
+            RHN_ORG_ID=$(rhn_findorg)
+        fi
+        if [ -n "$RHN_ORG_ID" ] ; then
+            subscription-manager register --activationkey=${RHN_ACTIVATION_KEY} --org=${RHN_ORG_ID}
+            return
+        fi
     fi
-    subscription-manager register --consumerid=$RHN_OLD_SYSTEM --username=$RHN_USER
-    return
-  fi
-  cat<<EOF
+    if [ -n "$RHN_USER" ] && [ -n "$RHN_PASS" ] ; then
+        RHN_OLD_SYSTEM=$(rhn_helper)
+        if [ -z "$RHN_OLD_SYSTEM" ] ; then
+            echo "### Unable to find UUID for existing subscripbed host with this hostname." >&2
+        fi
+    fi
+    if [ -n "$RHN_OLD_SYSTEM" ] && [ -n "$RHN_USER" ] ; then
+        subscription-manager register --consumerid=$RHN_OLD_SYSTEM --username=$RHN_USER
+        return
+    fi
+    cat<<EOF
 Needed environment variables not set!
 
 If you want to reuse an existing system:
@@ -59,16 +65,19 @@ If you want to reuse an existing system:
 
 However, if you want to use an activation key, you need to do this:
 
-1) On an exsting system, find your Red Hat Organization Id:
-2) Log in and run: subscription-manager identity
-3) Setup an activation key via: https://access.redhat.com/management/activation_keys
-4) Set these ENV variables:
+1) Setup an activation key via: https://access.redhat.com/management/activation_keys
+2) Set these ENV variables:
 
     export RHN_ACTIVATION_KEY=MY_COOL_KEY
+    # _either_
     export RHN_ORG_ID=31337
+    # _or_
+    export RHN_USER=biholmes
+
+3) If you're using the RHN_USER, a helper script will find the ORG
 
 EOF
-  exit 1
+    exit 1
 }
 
 fix_hostname() {

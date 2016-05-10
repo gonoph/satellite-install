@@ -54,7 +54,13 @@ Ater the installation of the server, you will need to further configure it with 
     BETA Mode on
     usage: ./scripts/hammer.sh (manifest (FILE) | all | -h | --help | repos | satellite | repos-extra | sync | view | publish | provisioning)
 
-The 1st thing you will do, is install your manifest, repos, then satellite repos (if needed), extra repos, sync plans, content views, publish it, then set it up for provisioning. Here is an example using the 6.2 BETA mode.
+The 1st thing you will do, is install your manifest, repos, then satellite repos (if needed), extra repos, sync plans, content views, publish it, then set it up for provisioning. The script assumes these defaults:
+
+    BETA=
+    ORG=1
+    LOC=2
+
+Here is an example using the 6.2 BETA mode.
 
     export BETA=1
     scripts/hammer.sh manifest /tmp/manifest.zip
@@ -64,6 +70,12 @@ The 1st thing you will do, is install your manifest, repos, then satellite repos
     scripts/hammer.sh view
     scripts/hammer.sh publish
     scripts/hammer.sh provisioning
+
+There's a timeout bug in the manifest import for 6.2 beta (even from the UI), so if that happens, you'll need to do a:
+
+    hammer subscription delete-manifest --organization-id=1
+
+And then perform the manifest import above. Bugzilla: [https://bugzilla.redhat.com/show_bug.cgi?id=1334383]
 
 ### Provision a system
 

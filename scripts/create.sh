@@ -9,16 +9,16 @@ MAC=
 : ${IP:=$(host $HOST | sed -n 's/.*has address //p')}
 [ -z "$IP" ] && { echo "$HOST does not have an ip address!" ; exit 1 ; }
 : ${ORG:=1}
-: ${LOCATION:=2}
+: ${LOC:=2}
 
 : ${RHEVM_USER:=admin@internal}
 : ${RHEVM_PASS:=redhat123}
 PW="$RHEVM_USER:$RHEVM_PASS"
-: ${url:=https://rhevm/ovirt-engine/api}
+: ${URL:=https://rhevm/ovirt-engine/api}
 ovirt() {
   add_url="$1"
   shift
-  curl -s --basic -k -u ${PW} ${url}${add_url} "$@" | tee /tmp/l
+  curl -s --basic -k -u ${PW} ${URL}${add_url} "$@" | tee /tmp/l
 }
 
 info() {
@@ -44,7 +44,7 @@ warn "NAME=$NAME"
 warn "IP=$IP"
 warn "HG=$HG"
 warn "ORG=$ORG"
-warn "LOCATION=$LOCATION"
+warn "LOC=$LOC"
 if [ "x$1" = "xclean" ] ; then
   info "Cleaning up run for $HOST"
   hammer --csv host list --search name=${HOST} | tail -n +2 | cut -d , -f 1,2 | tr ',' ' ' > /tmp/x
@@ -109,12 +109,12 @@ fi
 
 set -e
 
-info "Creating host in foreman: $HOST, mac=$MAC, ip=$IP, HG=$HG, ORG=$ORG, LOC=$LOCATION"
+info "Creating host in foreman: $HOST, mac=$MAC, ip=$IP, HG=$HG, ORG=$ORG, LOC=$LOC"
 cmd "hammer host create --name=${HOST} \
   --hostgroup=$HG \
   --interface='primary=true, provision=true, mac=${MAC}, ip=$IP' \
   --organization-id=$ORG \
-  --location-id=$LOCATION \
+  --location-id=$LOC \
   --root-password=redhat123"
 # --ask-root-password=yes
 

@@ -81,37 +81,49 @@ EOF
 }
 
 fix_hostname() {
-  HOST=$(subscription-manager identity | grep ^name: | cut -d ' ' -f 2)
-  if [ "$(hostname)" = "$HOST" ] ; then
-    return
-  fi
+    HOST=$(subscription-manager identity | grep ^name: | cut -d ' ' -f 2)
+    if [ "$(hostname)" = "$HOST" ] ; then
+        return
+    fi
 
-  echo "Current hostname and old hostname don't match."
-  echo "Setting current hostname to: $HOST"
-  hostnamectl set-hostname $HOST
+    echo "Current hostname and old hostname don't match."
+    echo "Setting current hostname to: $HOST"
+    hostnamectl set-hostname $HOST
 }
 
 fix_ip() {
-  echo "Determining old ip from hostname: $HOST"
-  OLDIP=$(ping -w 1 -c 1 $HOST 2>/dev/null | grep ^PING | tr '()' ',' | cut -d , -f 2)
-  if [ -z "$OLDIP" ] ; then
-    echo "Unable to determine old ipaddress"
-    return
-  fi
-  IP_MASK=$(nmcli c show eth0 | grep ipv4.addresses | tr -s ' ' | cut -d ' ' -f 2)
-  MASK=$(cut -d / -f 2 <<< "$IP_MASK")
-  IP=$(cut -d / -f 1 <<< "$IP_MASK")
-  if [ "$IP" = "$OLDIP" ] ; then
-    echo "Old ip and current ip are the same."
-    return
-  fi
-  INTERFACE=$(ip route | grep ^default | sed 's/^.*dev \([[:alnum:]]*\) .*$/\1/')
-  if [ -z "$INTERFACE" ] ; then
-    echo "Unable to find primary ethernet device!"
-    exit 1
-  fi
-  echo "Old ip and current ip don't match, setting ip to old ip: $OLDIP/$MASK"
-  nmcli c modify $INTERFACE ipv4.addresses "$OLDIP/$MASK"
+    echo "Determining old ip from hostname: $HOST"
+    OLDIP=$(ping -w 1 -c 1 $HOST 2>/dev/null | grep ^PING | tr '()' ',' | cut -d , -f 2)
+    if [ -z "$OLDIP" ] ; then
+        echo "Unable to determine old ipaddress"
+        return
+    fi
+    INTERFACE=$(ip route | grep ^default | sed 's/^.*dev \([[:alnum:]]*\) .*$/\1/')
+    if [ -z "$INTERFACE" ] ; then
+        echo "Unable to find primary ethernet device!"
+        exit 1
+    fi
+    T=$(nmcli c show $INTERFACE | grep ipv4\. | tr -s ' ' | sed -e 's/: \(.*\)$/="\1"/' -e 's/ipv4\./local ipv4_/' -e 's/-/_/g' );
+    if [ -z "$T" ] ; then
+        echo "Unable to determine IP address information!"
+        exit 1
+    fi
+    eval $T
+
+    IP_MASK=$(nmcli c show $INTERFACE | grep ipv4.addresses | tr -s ' ' | cut -d ' ' -f 2 | cut -d , -f 1)
+    MASK=$(cut -d / -f 2 <<< "$IP_MASK")
+    IP=$(cut -d / -f 1 <<< "$IP_MASK")
+    if [ "$IP" = "$OLDIP" ] ; then
+        echo "Old ip and current ip are the same."
+        return
+    fi
+    echo "Old ip and current ip don't match, setting ip to old ip: $OLDIP/$MASK"
+    nmcli c modify $INTERFACE -ipv4.addresses
+    nmcli c modify $INTERFACE ipv4.method manual
+    nmcli c modify $INTERFACE ipv4.addresses "$OLDIP/$MASK"
+    nmcli c modify $INTERFACE ipv4.dns "$ipv4_dns"
+    nmcli c modify $INTERFACE ipv4.dns_search "$ipv4_dns_search"
+    nmcli c modify $INTERFACE ipv4.gateway "$ipv4_gateway"
 }
 
 subscription-manager identity || register_system

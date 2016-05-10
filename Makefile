@@ -56,7 +56,7 @@ pre-install: .done_pre-install
 ifdef BETA
 .done_pre-install: export BETA=1
 endif
-.done_pre-install: $(HAMMER_CONF_INSTALLED) $(BLOCKDEV_CONF_INSTALLED) $(PRE_SCRIPT)
+.done_pre-install: $(HAMMER_CONF_INSTALLED) $(BLOCKDEV_CONF_INSTALLED) $(SUDOERS_D_INSTALLED) $(PRE_SCRIPT)
 	./$(PRE_SCRIPT)
 	touch $@
 

@@ -115,14 +115,14 @@ fix_ip() {
     IP=$(cut -d / -f 1 <<< "$IP_MASK")
     if [ "$IP" = "$OLDIP" ] ; then
         echo "Old ip and current ip are the same."
+        unset INTERFACE
         return
     fi
     echo "Old ip and current ip don't match, setting ip to old ip: $OLDIP/$MASK"
-    nmcli c modify $INTERFACE -ipv4.addresses
     nmcli c modify $INTERFACE ipv4.method manual
-    nmcli c modify $INTERFACE ipv4.addresses "$OLDIP/$MASK"
+    nmcli c modify $INTERFACE +ipv4.addresses "$OLDIP/$MASK" -ipv4.addresses "$IP/$MASK"
     nmcli c modify $INTERFACE ipv4.dns "$ipv4_dns"
-    nmcli c modify $INTERFACE ipv4.dns_search "$ipv4_dns_search"
+    nmcli c modify $INTERFACE ipv4.dns-search "$ipv4_dns_search"
     nmcli c modify $INTERFACE ipv4.gateway "$ipv4_gateway"
 }
 

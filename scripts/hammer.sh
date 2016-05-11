@@ -204,6 +204,17 @@ if [ "$SECTION" = "all" -o "$SECTION" = "publish" ] ; then
 fi
 
 if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
+    info "Making sure default location and org belong to one another"
+    hammer location add-organization --id=$LOC $ORG
+
+    info "Making sure default domain belongs to the default location and org"
+    ID=$(hammer --csv domain list --search=name=$(hostname -d) | tail -n +2 | cut -d, -f 1)
+    if [ -z "$ID" ] ; then
+        warn "Unable to locate default domain: \e[1m$(hostname -d)" 
+        exit 1
+    fi
+    hammer domain update --id=$ID --location-ids=$LOC --organization-ids=$_ORG
+
     HOSTNAME=$(hostname)
     info "Provisioning: setting default location and org for host \e[1m$HOSTNAME"
     MY_ID=$(hammer --csv host list --search=name=$HOSTNAME | tail -n +2 | cut -d, -f 1)

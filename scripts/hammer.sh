@@ -204,6 +204,24 @@ if [ "$SECTION" = "all" -o "$SECTION" = "publish" ] ; then
 fi
 
 if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
+    HOSTNAME=$(hostname)
+    info "Provisioning: setting default location and org for host \e[1m$HOSTNAME"
+    MY_ID=$(hammer --csv host list --search=name=$HOSTNAME | tail -n +2 | cut -d, -f 1)
+    if [ -z "$MY_ID" ] ; then
+        warn "Unable to locate host-id for \e[1m$HOSTNAME"
+        exit 1
+    fi
+    hammer host update --id=$MY_ID --location-id=$LOC $ORG
+
+    info "Making sure the default puppet environment has the default location and org"
+    DEFAULT_PUPPET=$(hammer --csv environment info --id=1 | tail -n +2 | cut -d, -f 2)
+    if [ -z "$DEFAULT_PUPPET" ] ; then
+        warn "Unable to locate puppet environment with \e[1m--id=1"
+        exit 1
+    fi
+    info "Setting default location and org for Default puppet environment \e[1m$DEFAULT_PUPPET"
+    environment update --location-ids=$LOC --organization-ids=$_ORG --id=1
+
     info "Provisioning setting: subnet"
     INTERFACE=$(ip route | grep ^default | sed 's/^.*dev \([[:alnum:]]*\) .*$/\1/')
     info "Copying subnet information from : $INTERFACE"

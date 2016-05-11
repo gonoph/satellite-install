@@ -144,7 +144,7 @@ if [ "$SECTION" = "all" -o "$SECTION" = "sync" ]; then
     done
     PRODUCT="Red Hat Enterprise Linux Server"
     info "Must synchronize kickstart before anything else for: \e[1m$PRODUCT"
-    AVAIL=$(hammer --csv repository list ${ORG} --product="$PRODUCT" | tail -n +2 | grep -i kickstart)
+    AVAIL=$(hammer --csv repository list ${ORG} --product="$PRODUCT" | tail -n +2 | grep -i kickstart | tail -n 1) # there can be only one
     if [ -z "$AVAIL" ] ; then
         warn "Unable to find kickstart repository! Have you: \e[1mUploaded manifests or created repos?"
         exit 1

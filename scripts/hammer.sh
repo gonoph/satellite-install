@@ -57,15 +57,8 @@ if [ "$SECTION" = "manifest" ] ; then
         fi
     done
     hammer subscription delete-manifest $ORG
-    hammer subscription upload --file "$FILE" $ORG --async
-    I=10
-    while [ $I -gt 0 ] ; do
-        hammer subscription list $ORG
-        DONE=$(hammer --csv subscription list --organization-id=1 | tail -n +2)
-        [ -n "$DONE" ] && break
-        I=$[ I - 1 ]
-        sleep 3
-    done
+    hammer subscription upload --file "$FILE" $ORG
+    hammer subscription list $ORG
     exit
 fi
 

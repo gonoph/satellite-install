@@ -64,7 +64,7 @@ install: pre-install .done_install post-install
 ifdef BETA
 .done_install: export BETA=1
 endif
-.done_install: $(INSTALL_SCRIPT)
+.done_install: $(INSTALL_SCRIPT) $(PULP_SOURCES_INSTALLED)
 	./$(INSTALL_SCRIPT)
 	touch $@
 
@@ -72,7 +72,7 @@ post-install: .done_post-install
 ifdef BETA
 .done_post-install: export BETA=1
 endif
-.done_post-install: $(PULP_SOURCES_INSTALLED) $(POST_SCRIPT)
+.done_post-install: $(POST_SCRIPT)
 	./$(POST_SCRIPT)
 	touch $@
 

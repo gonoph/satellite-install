@@ -154,6 +154,7 @@ if [ "$SECTION" = "all" -o "$SECTION" = "sync" ]; then
     hammer repository synchronize --product="$PROD" ${ORG} --id=$ID
 
     info "Synchronizing all the other repos for: \e[1m$PRODUCT"
+    # the reason for this strange create-a-script is due to hammer trying to access the tty via stty, and spamming the console with stty errors
     >/tmp/l
     hammer --csv repository list ${ORG} --product="$PRODUCT" | tail -n +2 | grep -v -i kickstart | while IFS=, read ID NAME PROD TYPE URI ; do
         echo -n 'echo ' >> /tmp/l

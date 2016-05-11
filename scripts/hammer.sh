@@ -136,12 +136,35 @@ if [ "$SECTION" = "all" -o "$SECTION" = "sync" ]; then
 
     info "Adding all repos to the sync plan"
     ## add stuff to the sync plan
-    hammer --csv product list --organization-id=1 | tail -n +2 | while IFS=, read P_ID NAME J1 J2 REPOS J3 ; do
+    hammer --csv product list ${ORG} | tail -n +2 | while IFS=, read P_ID NAME J1 J2 REPOS J3 ; do
         if [ $REPOS -gt 0 ] ; then
             info "Adding: $NAME"
             hammer product set-sync-plan --sync-plan-id=1 ${ORG} --name="$NAME"
         fi
     done
+    PRODUCT="Red Hat Enterprise Linux Server"
+    info "Must synchronize kickstart before anything else for: \e[1m$PRODUCT"
+    AVAIL=$(hammer --csv repository list ${ORG} --product="$PRODUCT" | tail -n +2 | grep -i kickstart)
+    if [ -z "$AVAIL" ] ; then
+        warn "Unable to find kickstart repository! Have you: \e[1mUploaded manifests or created repos?"
+        exit 1
+    fi
+    IFS=, read ID NAME PROD TYPE URI <<< "$AVAIL"
+    info "Synchronizing: \e[1m$NAME"
+    hammer repository synchronize --product="$PROD" ${ORG} --id=$ID
+
+    info "Synchronizing all the other repos for: \e[1m$PRODUCT"
+    >/tmp/l
+    hammer --csv repository list ${ORG} --product="$PRODUCT" | tail -n +2 | grep -v -i kickstart | while IFS=, read ID NAME PROD TYPE URI ; do
+        echo -n 'echo ' >> /tmp/l
+        info "   Syncing: \e[1m$NAME" >> /tmp/l
+        echo "hammer repository synchronize --product='$PROD' '${ORG}' --id=$ID" >> /tmp/l
+    done
+    if [ -s /tmp/l ] ; then
+        chmod +x /tmp/l && /tmp/l
+    else
+        warn "Unable to find other repos to synchronize!"
+    fi
 fi
 
 if [ "$SECTION" = "all" -o "$SECTION" = "view" ] ; then
@@ -191,8 +214,23 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
     info "Provisioning setting: activation-key"
     hammer activation-key create $ORG --name=RHEL7-BASE --content-view='Default Organization View' --lifecycle-environment=Library --unlimited-content-hosts
 
+    info "Determining medium for kickstart"
+    LABEL=$(hammer --output=yaml organization info --id=$_ORG | grep ^Label | cut -d ' ' -f 2)
+    if [ -z "$LABEL" ] ; then
+        warn "Unable to locate name for organization-id: \e[1m$_ORG"
+        exit 1
+    fi
+    info "Looking for kickstart with patterns: \e[1mKickstart $LABEL"
+    MEDIUM=$(hammer --csv medium list | grep Kickstart | grep $LABEL | cut -d , -f 1,2)
+    if [ -z "$MEDIUM" ] ; then
+        warn "Unable to locate medium for kickstart"
+        exit 1
+    fi
+    IFS=, read ID NAME URL <<< "$MEDIUM"
+    info "Found kickstart medium \e[1m[$ID] $NAME"
+
     info "Provisioning setting: hostgroup"
-    hammer hostgroup create --organization-ids=${_ORG} --architecture=x86_64 --domain=$(hostname -d) --environment=production --medium=Test62/Library/Red_Hat_Server/Red_Hat_Enterprise_Linux_7_Server_Kickstart_x86_64_7Server --name=RHEL7-Server --operatingsystem='RedHat 7.2' --partition-table='Kickstart default' --puppet-ca-proxy-id=1 --puppet-proxy-id=1 --subnet=$(hostname -d) --root-pass=redhat123
+    hammer hostgroup create --organization-ids=${_ORG} --architecture=x86_64 --domain=$(hostname -d) --environment=production --medium-id=$ID --operatingsystem='RedHat 7.2' --partition-table='Kickstart default' --puppet-ca-proxy-id=1 --puppet-proxy-id=1 --subnet=$(hostname -d) --root-pass=redhat123
 
     info "Provisioning setting: adding subscriptions to activation key"
     SUBSCRIPTION_ID=$(hammer --output=csv subscription list ${ORG} | awk -F, '/^Employee/ {print $8}')

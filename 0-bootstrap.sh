@@ -136,7 +136,7 @@ cat /tmp/l | wc -l
 echo -n "Enabling repos: "
 subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms > /tmp/l 2>&1
 cat /tmp/l | wc -l
-yum install -y screen git vim
+yum install -y screen git vim bind-utils
 
 [ -r satellite-install/.git ] || git clone https://github.com/gonoph/satellite-install.git
 

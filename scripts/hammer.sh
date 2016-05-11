@@ -232,7 +232,7 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
     info "Found kickstart medium \e[1m[$ID] $NAME"
 
     info "Provisioning setting: hostgroup"
-    hammer hostgroup create --organization-ids=${_ORG} --architecture=x86_64 --domain=$(hostname -d) --environment=production --medium-id=$ID --operatingsystem='RedHat 7.2' --partition-table='Kickstart default' --puppet-ca-proxy-id=1 --puppet-proxy-id=1 --subnet=$(hostname -d) --root-pass=redhat123
+    hammer hostgroup create --name=RHEL7-Server --organization-ids=${_ORG} --architecture=x86_64 --domain=$(hostname -d) --environment=production --medium-id=$ID --operatingsystem='RedHat 7.2' --partition-table='Kickstart default' --puppet-ca-proxy-id=1 --puppet-proxy-id=1 --subnet=$(hostname -d) --root-pass=redhat123
 
     info "Provisioning setting: adding subscriptions to activation key"
     SUBSCRIPTION_ID=$(hammer --output=csv subscription list ${ORG} | awk -F, '/^Employee/ {print $8}')

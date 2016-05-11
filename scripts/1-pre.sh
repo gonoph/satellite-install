@@ -42,6 +42,7 @@ firewall-cmd --permanent --add-port="53/udp" --add-port="53/tcp" \
 # actually install katello / satellite
 yum -y install \
 	katello \
+	bind-utils \
 	rubygem-smart_proxy_discovery \
 	ruby193-rubygem-foreman_discovery \
 	foreman-discovery-image \

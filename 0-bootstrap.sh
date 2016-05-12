@@ -190,11 +190,13 @@ the CDN back to Red Hat defaults.
 
 	subscription-manager clean
 	subscription-manager register --consumerid=${B}$CONSUMERID${b} --baseurl=${B}\$MYURL${b}
+	make install
 
 Then after the satellite install, you can go back
 
 	subscription-manager clean
 	subscription-manager register --consumerid=${B}$CONSUMERID${b} --baseurl=${B}https://cdn.redhat.com${b}
+	make pre-install-only
 
 EOF
 if [ -n "$INTERFACE" ] ; then

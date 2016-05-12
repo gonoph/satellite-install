@@ -98,7 +98,7 @@ EOF
 }
 
 fix_hostname() {
-    HOST=$(subscription-manager identity | grep ^name: | cut -d ' ' -f 2)
+    HOST=$(subscription-manager identity | awk '/^name: / { print $2 }')
     if [ "$(hostname)" = "$HOST" ] ; then
 	echo "Just making sure hostname matches what's in hostnamectl"
 	hostnamectl set-hostname $HOST
@@ -175,6 +175,28 @@ if fgrep -q nfs /etc/fstab ; then
   esac
 fi
 
+# for some reason my vim was freaking out on the ansi bracket in a $(cmd)
+echo -e "B='\e[1m'" > /tmp/b
+echo -e "b='\e[22m'" >> /tmp/b
+source /tmp/b
+rm -f /tmp/b
+
+CONSUMERID=$(subscription-manager identity | awk -n '/^system identity: / {print $3}')
+cat << EOF
+There is a special trick you can do before and after the pre-install script. If
+you have a local CDN copy of the repos, you can register your system using your
+copy as the ${B}baseurl${b}, then reregister back to the same system resetting
+the CDN back to Red Hat defaults.
+
+	subscription-manager clean
+	subscription-manager register --consumerid=${B}$CONSUMERID${b} --baseurl=${B}\$MYURL${b}
+
+Then after the satellite install, you can go back
+
+	subscription-manger clean
+	subscription-manager register --consumerid=${B}$CONSUMERID${b} --baseurl=${B}https://cdn.redhat.com${b}
+
+EOF
 if [ -n "$INTERFACE" ] ; then
   echo "IP address changed! You should reboot!"
   read -p "Reboot now? " YN

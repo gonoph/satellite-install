@@ -112,7 +112,7 @@ fix_hostname() {
 
 fix_ip() {
     echo "Determining old ip from hostname: $HOST"
-    OLDIP=$(ping -w 1 -c 1 $HOST 2>/dev/null | grep ^PING | tr '()' ',' | cut -d , -f 2)
+    local OLDIP=$(ping -w 1 -c 1 $HOST 2>/dev/null | grep ^PING | tr '()' ',' | cut -d , -f 2)
     if [ -z "$OLDIP" ] ; then
         echo "Unable to determine old ipaddress"
         return
@@ -122,14 +122,14 @@ fix_ip() {
         echo "Unable to find primary ethernet device!"
         exit 1
     fi
-    T=$(nmcli c show $INTERFACE | grep ipv4\. | tr -s ' ' | sed -e 's/: \(.*\)$/="\1"/' -e 's/ipv4\./local ipv4_/' -e 's/-/_/g' );
+    local T=$(nmcli c show $INTERFACE | grep ipv4\. | tr -s ' ' | sed -e 's/: \(.*\)$/="\1"/' -e 's/ipv4\./local ipv4_/' -e 's/-/_/g' );
     if [ -z "$T" ] ; then
         echo "Unable to determine IP address information!"
         exit 1
     fi
     eval $T
 
-    IP_MASK=$(nmcli c show $INTERFACE | grep ipv4.addresses | tr -s ' ' | cut -d ' ' -f 2 | cut -d , -f 1)
+    IP_MASK=$(tr -s ' ' <<< "$ipv4_addresses" | cut -d ' ' -f 2 | cut -d , -f 1)
     MASK=$(cut -d / -f 2 <<< "$IP_MASK")
     IP=$(cut -d / -f 1 <<< "$IP_MASK")
     if [ "$IP" = "$OLDIP" ] ; then

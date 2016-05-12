@@ -231,7 +231,7 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
         exit 1
     fi
     info "Setting default location and org for Default puppet environment \e[1m$DEFAULT_PUPPET"
-    environment update --location-ids=$LOC --organization-ids=$_ORG --id=1
+    hammer environment update --location-ids=$LOC --organization-ids=$_ORG --id=1
 
     info "Provisioning setting: subnet"
     INTERFACE=$(ip route | grep ^default | sed 's/^.*dev \([[:alnum:]]*\) .*$/\1/')

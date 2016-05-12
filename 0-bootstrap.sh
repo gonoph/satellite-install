@@ -193,7 +193,7 @@ the CDN back to Red Hat defaults.
 
 Then after the satellite install, you can go back
 
-	subscription-manger clean
+	subscription-manager clean
 	subscription-manager register --consumerid=${B}$CONSUMERID${b} --baseurl=${B}https://cdn.redhat.com${b}
 
 EOF

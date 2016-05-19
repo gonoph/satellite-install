@@ -31,8 +31,13 @@ MAC=
 
 : ${RHEVM_USER:=admin@internal}
 : ${RHEVM_PASS:=redhat123}
+: ${RHEVM_CLUSTER:=AMD-Cheap}
+: ${RHEVM_STORAGE:=ZFS-data}
 PW="$RHEVM_USER:$RHEVM_PASS"
-: ${URL:=https://rhevm/ovirt-engine/api}
+: ${URL:=https://rhevm/ovirt-engine/api}A
+
+: ${NEW_HOST_ROOT:=redhat123}
+
 ovirt() {
   add_url="$1"
   shift
@@ -63,6 +68,10 @@ warn "IP=$IP"
 warn "HG=$HG"
 warn "ORG=$ORG"
 warn "LOC=$LOC"
+warn "RHEVM_CLUSTER=$RHEVM_CLUSTER"
+warn "RHEVM_STORAGE=$RHEVM_STORAGE"
+warn "NEW_HOST_ROOT=$NEW_HOST_ROOT"
+
 if [ "x$1" = "xclean" ] ; then
   info "Cleaning up run for $HOST"
   hammer --csv host list --search name=${HOST} | tail -n +2 | cut -d , -f 1,2 | tr ',' ' ' > /tmp/x
@@ -87,7 +96,7 @@ fi
 
 info "Creating VM: $NAME"
 cat<< EOF >/tmp/x
-<vm><name>${NAME}</name><template><name>Blank</name></template><cluster><name>AMD-Cheap</name></cluster><display><type>VNC</type></display><os type="rhel_7x64"><boot dev="hd"/><boot dev="network"/></os><type>server</type></vm>
+<vm><name>${NAME}</name><template><name>Blank</name></template><cluster><name>${RHEVM_CLUSTER}</name></cluster><display><type>VNC</type></display><os type="rhel_7x64"><boot dev="hd"/><boot dev="network"/></os><type>server</type></vm>
 EOF
 VMS_ID=$(ovirt /vms -H "Content-type: application/xml" -d @/tmp/x | grep vm.href | grep id= | sed 's/^.* id="\(.*\)".*$/\1/')
 warn "VMS_ID=$VMS_ID"
@@ -95,7 +104,7 @@ test -n "$VMS_ID"
 
 info "Creating disk: disk1 for vms=$VMS_ID"
 cat<< EOF >/tmp/x
-<disk><provisioned_size>10737418240</provisioned_size><name>disk1</name><interface>virtio_scsi</interface><format>cow</format><storage_domains><storage_domain><name>ZFS-data</name></storage_domain></storage_domains><bootable>true</bootable></disk>
+<disk><provisioned_size>10737418240</provisioned_size><name>disk1</name><interface>virtio_scsi</interface><format>cow</format><storage_domains><storage_domain><name>${RHEVM_STORAGE}</name></storage_domain></storage_domains><bootable>true</bootable></disk>
 EOF
 DISK_ID=$(ovirt /vms/$VMS_ID/disks -d @/tmp/x -H "Content-type: application/xml" | grep disk.href | grep id= | sed 's/^.* id="\(.*\)".*$/\1/')
 warn "Disk_ID=$DISK_ID"
@@ -128,12 +137,13 @@ fi
 set -e
 
 info "Creating host in foreman: $HOST, mac=$MAC, ip=$IP, HG=$HG, ORG=$ORG, LOC=$LOC"
+info "Root password defaulting to: \e[1m${NEW_HOST_ROOT}"
 cmd "hammer host create --name=${HOST} \
   --hostgroup=$HG \
   --interface='primary=true, provision=true, mac=${MAC}, ip=$IP' \
   --organization-id=$ORG \
   --location-id=$LOC \
-  --root-password=redhat123"
+  --root-password=${NEW_HOST_ROOT}"
 # --ask-root-password=yes
 
 

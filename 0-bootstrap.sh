@@ -129,7 +129,7 @@ fix_ip() {
     fi
     eval $T
 
-    IP_MASK=$(tr -s ' ' <<< "$ipv4_addresses" | cut -d ' ' -f 2 | cut -d , -f 1)
+    IP_MASK=$( ip addr show $INTERFACE | grep 'inet ' | tr -s ' ' | cut -d ' ' -f 3)
     MASK=$(cut -d / -f 2 <<< "$IP_MASK")
     IP=$(cut -d / -f 1 <<< "$IP_MASK")
     if [ "$IP" = "$OLDIP" ] ; then
@@ -137,12 +137,21 @@ fix_ip() {
         unset INTERFACE
         return
     fi
-    echo "Old ip and current ip don't match, setting ip to old ip: $OLDIP/$MASK"
-    nmcli c modify $INTERFACE ipv4.method manual
-    nmcli c modify $INTERFACE +ipv4.addresses "$OLDIP/$MASK" -ipv4.addresses "$IP/$MASK"
-    nmcli c modify $INTERFACE ipv4.dns "$ipv4_dns"
-    nmcli c modify $INTERFACE ipv4.dns-search "$ipv4_dns_search"
-    nmcli c modify $INTERFACE ipv4.gateway "$ipv4_gateway"
+    echo "Old ip and current ip don't match, setting ip to old ip: [$OLDIP/$MASK]"
+    if [ "$ipv4_method" = "auto" ] ; then
+        nmcli c modify $INTERFACE ipv4.method manual +ipv4.addresses "$OLDIP/$MASK"
+	local DNS=$(nmcli c show enp0s3 | grep ' domain_name_servers' | cut -d = -f 2 | tr -d ' ')
+	local SEARCH=$( awk '/^search / {print }' /etc/resolv.conf)
+	local GW=$( nmcli c show enp0s3 | grep ' routers' | cut -d = -f 2 | tr -d ' ')
+	nmcli c modify $INTERFACE ipv4.dns "$DNS"
+	nmcli c modify $INTERFACE ipv4.dns-search "$SEARCH"
+	nmcli c modify $INTERFACE ipv4.gateway "$GW"
+    else
+        nmcli c modify $INTERFACE ipv4.method manual +ipv4.addresses "$OLDIP/$MASK" -ipv4.addresses "$IP/$MASK"
+        nmcli c modify $INTERFACE ipv4.dns "$ipv4_dns"
+        nmcli c modify $INTERFACE ipv4.dns-search "$ipv4_dns_search"
+        nmcli c modify $INTERFACE ipv4.gateway "$ipv4_gateway"
+    fi
 }
 
 subscription-manager identity || register_system

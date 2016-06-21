@@ -261,7 +261,7 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
     hammer location add-subnet --id=$LOC --subnet=$(hostname -d)
 
     info "Provisioning setting: activation-key"
-    hammer activation-key create $ORG --name=RHEL7-BASE --content-view='Default Organization View' --lifecycle-environment=Library --unlimited-content-hosts
+    hammer activation-key create $ORG --name=RHEL7-BASE --content-view='Default Organization View' --lifecycle-environment=Library --unlimited-hosts
 
     info "Determining medium for kickstart"
     LABEL=$(hammer --output=yaml organization info --id=$_ORG | grep ^Label | cut -d ' ' -f 2)
@@ -282,7 +282,7 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
     hammer hostgroup create --name=RHEL7-Server --organization-ids=${_ORG} --architecture=x86_64 --domain=$(hostname -d) --environment=production --medium-id=$ID --operatingsystem='RedHat 7.2' --partition-table='Kickstart default' --puppet-ca-proxy-id=1 --puppet-proxy-id=1 --subnet=$(hostname -d) --root-pass=redhat123
 
     info "Provisioning setting: adding subscriptions to activation key"
-    SUBSCRIPTION_ID=$(hammer --output=csv subscription list ${ORG} | awk -F, '/^Employee/ {print $8}')
+    SUBSCRIPTION_ID=$(hammer --output=csv subscription list --organization-id=1 | awk -F, '/,Employee SKU,/ {print $1}')
     hammer activation-key add-subscription ${ORG} --name=RHEL7-BASE --subscription-id=$SUBSCRIPTION_ID
 
     info "Provisioning setting: adding satellite and common repos to activation key"

@@ -141,7 +141,7 @@ fix_ip() {
     if [ "$ipv4_method" = "auto" ] ; then
         nmcli c modify $INTERFACE ipv4.method manual +ipv4.addresses "$OLDIP/$MASK"
 	local DNS=$(nmcli c show enp0s3 | grep ' domain_name_servers' | cut -d = -f 2 | tr -d ' ')
-	local SEARCH=$( awk '/^search / {print }' /etc/resolv.conf)
+	local SEARCH=$( awk '/^search / {print $2}' /etc/resolv.conf)
 	local GW=$( nmcli c show enp0s3 | grep ' routers' | cut -d = -f 2 | tr -d ' ')
 	nmcli c modify $INTERFACE ipv4.dns "$DNS"
 	nmcli c modify $INTERFACE ipv4.dns-search "$SEARCH"

@@ -139,18 +139,12 @@ fix_ip() {
     fi
     echo "Old ip and current ip don't match, setting ip to old ip: [$OLDIP/$MASK]"
     if [ "$ipv4_method" = "auto" ] ; then
-        nmcli c modify $INTERFACE ipv4.method manual +ipv4.addresses "$OLDIP/$MASK"
-	local DNS=$(nmcli c show enp0s3 | grep ' domain_name_servers' | cut -d = -f 2 | tr -d ' ')
+	local DNS=$(nmcli c show $INTERFACE | grep ' domain_name_servers' | cut -d = -f 2 | cut -d ' ' -f 2-)
 	local SEARCH=$( awk '/^search / {print $2}' /etc/resolv.conf)
-	local GW=$( nmcli c show enp0s3 | grep ' routers' | cut -d = -f 2 | tr -d ' ')
-	nmcli c modify $INTERFACE ipv4.dns "$DNS"
-	nmcli c modify $INTERFACE ipv4.dns-search "$SEARCH"
-	nmcli c modify $INTERFACE ipv4.gateway "$GW"
+	local GW=$( nmcli c show $INTERFACE | grep ' routers' | cut -d = -f 2 | tr -d ' ')
+        nmcli c modify $INTERFACE ipv4.method manual +ipv4.addresses "$OLDIP/$MASK" ipv4.dns "$DNS" ipv4.dns-search "$SEARCH" ipv4.gateway "$GW"
     else
-        nmcli c modify $INTERFACE ipv4.method manual +ipv4.addresses "$OLDIP/$MASK" -ipv4.addresses "$IP/$MASK"
-        nmcli c modify $INTERFACE ipv4.dns "$ipv4_dns"
-        nmcli c modify $INTERFACE ipv4.dns-search "$ipv4_dns_search"
-        nmcli c modify $INTERFACE ipv4.gateway "$ipv4_gateway"
+        nmcli c modify $INTERFACE ipv4.method manual +ipv4.addresses "$OLDIP/$MASK" -ipv4.addresses "$IP/$MASK" ipv4.dns "$ipv4_dns" ipv4.dns-search "$ipv4_dns_search" ipv4.gateway "$ipv4_gateway"
     fi
 }
 

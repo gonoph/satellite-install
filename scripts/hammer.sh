@@ -253,6 +253,7 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
     T=$(./ip_mask.pl $IP_MASK)
     eval $T
     SUBNET_NAME=$(hostname -d)
+    [ "$ipv4_gateway" = "__" ] && ipv4_gateway=$IP
 
     info "hammer subnet create --organization-ids=${_ORG} --boot-mode=Static $DNS --name=$SUBNET_NAME --network=$NETWORK --mask=$NETMASK --gateway=${ipv4_gateway}  --ipam=None --tftp-id=1"
     hammer subnet create --organization-ids=${_ORG} --boot-mode=Static $DNS --name=$SUBNET_NAME --network=$NETWORK --mask=$NETMASK --gateway=${ipv4_gateway}  --ipam=None --tftp-id=1
@@ -295,4 +296,12 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
 
     info "Provisioning setting: assigning activation key to hostgroup"
     hammer hostgroup set-parameter --hostgroup=RHEL7-Server --name=kt_activation_keys --value=RHEL7-BASE
+
+    info "Remastering PXE-less discovery image"
+    if [ -r /usr/share/foreman-discovery-image/auto-foreman-discovery-image-3.1.1-13.iso ] ; then
+        info "Already exists: \e[1m/usr/share/foreman-discovery-image/auto-foreman-discovery-image-3.1.1-13.iso"
+    else
+        discovery-remaster /usr/share/foreman-discovery-image/foreman-discovery-image-3.1.1-13.iso "proxy.url=https://$HOSTNAME:9090 proxy.type=proxy fdi.pxauto=1" /usr/share/foreman-discovery-image/auto-foreman-discovery-image-3.1.1-13.iso 2>/dev/null
+        info "Stored in \e[1m/usr/share/foreman-discovery-image/auto-foreman-discovery-image-3.1.1-13.iso"
+    fi
 fi

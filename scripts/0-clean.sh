@@ -35,6 +35,15 @@ rm /var/lib/qpidd/.qpidd/ /var/lib/qpidd/* -rfv
 rm /root/ssl-build/ -rfv
 sync
 
-yum autoremove katello -y
+yum -y autoremove \
+	katello \
+	foreman-discovery-image.noarch \
+	rubygem-smart_proxy_discovery.noarch \
+	rubygem-smart_proxy_discovery_image.noarch \
+	tfm-rubygem-foreman_discovery.noarch \
+	tfm-rubygem-hammer_cli_foreman_discovery.noarch \
+	httpd \
+	foreman \
+	pulp-admin-client
 rm /etc/candlepin/ /var/lib/foreman /var/lib/puppet -rfv /etc/httpd /etc/puppet /etc/foreman /etc/foreman-proxy
 sync

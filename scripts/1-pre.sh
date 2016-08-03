@@ -31,7 +31,9 @@ subscription-manager release --set=7Server
 
 # only set the repos we need and perform any updates
 rm -f /etc/yum.repos.d/redhat-new.repo
-subscription-manager repos --disable "*"
+echo -n "Disabling repos: "
+subscription-manager repos --disable "*" > /tmp/l 2>&1
+cat /tmp/l | wc -l
 subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms
 
 if [ -n "$BASEURL" ] ; then

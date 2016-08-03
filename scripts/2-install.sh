@@ -25,14 +25,17 @@
 : ${ORGANIZATION:=Test62}
 
 [ -n "$BETA" ] && echo -e "\e[1;31mBETA Mode on\e[0m"  || echo -e "\e[1;34mBETA MODE off\e[0m"
-# this is the beta form of the install command
+# this is the 6.2+ form of the install command
 
+    #--foreman-proxy-puppetca true \
+    # --foreman-proxy-tftp true \
   foreman-installer --scenario katello \
     --foreman-admin-username $SAT_USER \
     --foreman-admin-password $SAT_PASS \
     --capsule-puppet true \
-    --foreman-proxy-puppetca true \
-    --foreman-proxy-tftp true \
-    --enable-foreman-plugin-discovery \
     --foreman-initial-location $LOCATION \
-    --foreman-initial-organization $ORGANIZATION
+    --foreman-initial-organization $ORGANIZATION \
+    --enable-foreman-plugin-remote-execution \
+    --enable-foreman-plugin-templates \
+    --enable-foreman-proxy-plugin-remote-execution-ssh \
+    --enable-foreman-plugin-hooks

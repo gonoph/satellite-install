@@ -6,9 +6,17 @@
 [ -n "$BETA" ] && echo -e "\e[1;31mBETA Mode on\e[0m"  || echo -e "\e[1;34mBETA MODE off\e[0m"
 [ -n "$BASEURL" ] && echo -e "\e[1;31mBASEURL is set\e[0m"
 
+[ -r /tmp/.cache-release -a "$(cat /tmp/.cache-release)" = "Release: 7Server" ] || rm -fv /tmp/.cache-release
+
 err() {
   echo -e "\e[1;31mERROR:\e[0m" "$@"
   exit 1
+}
+
+set_release() {
+  [ -r /tmp/.cache-release -a "$(cat /tmp/.cache-release)" = "Release: 7Server" ] && return 0
+  subscription-manager release --set=7Server
+  subscription-manager release > /tmp/.cache-release
 }
 
 disable_repos() {
@@ -24,15 +32,16 @@ disable_repos() {
 }
 
 enable_repos() {
+  [ $# -eq 0 ] && err "Must give repos to enable"
   local args=""
-  [ $# -eq 0 ] || err "Must give repos to enable"
   while [ $# -gt 0 ] ; do
     args+="--enable=$1 "
     shift 1
   done
 
   [ -n "$BASEURL" ] && rm -f /etc/yum.repos.d/redhat-new.repo
-  subscription-manager repos "$args"
+  echo subscription-manager repos $args
+  subscription-manager repos $args
 
   if [ -n "$BASEURL" ] ; then
     echo -e "\e[1;31mEnabling $BASEURL for repos.\e[0m"

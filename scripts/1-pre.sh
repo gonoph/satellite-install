@@ -24,7 +24,7 @@ set -e
 . $(dirname `realpath scripts/1-pre.sh `)/../funcs.sh
 
 # set the release
-subscription-manager release --set=7Server
+set_release
 
 # only set the repos we need and perform any updates
 disable_repos

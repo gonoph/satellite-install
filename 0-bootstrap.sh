@@ -156,7 +156,7 @@ subscription-manager identity || register_system
 fix_hostname
 fix_ip
 
-subscription-manager release --set=7Server
+set_release
 disable_repos
 enable_repos rhel-7-server-rpms rhel-7-server-rh-common-rpms
 

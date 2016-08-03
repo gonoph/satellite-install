@@ -42,6 +42,7 @@ if [ -n "$BASEURL" ] ; then
   subscription-manager repos --disable "*" > /tmp/l 2>&1
   cat /tmp/l | wc -l
   mv -f /tmp/redhat-new.repo /etc/yum.repos.d/redhat-new.repo
+  rm -f /etc/yum.repos.d/redhat.repo
 fi
 
 yum update -y
@@ -62,6 +63,7 @@ if [ -n "$BASEURL" ] ; then
   subscription-manager repos --disable "*" > /tmp/l 2>&1
   cat /tmp/l | wc -l
   mv -f /tmp/redhat-new.repo /etc/yum.repos.d/redhat-new.repo
+  rm -f /etc/yum.repos.d/redhat.repo
 fi
 
 # setup the time

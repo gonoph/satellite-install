@@ -17,53 +17,26 @@
 # You should have received a copy of the GNU General Public License along with
 # Satellite-install.  If not, see <http://www.gnu.org/licenses/>.
 
-
-: ${BETA:=}
-: ${BASEURL:=}
-
-[ -n "$BETA" ] && echo -e "\e[1;31mBETA Mode on\e[0m"  || echo -e "\e[1;34mBETA MODE off\e[0m"
-[ -n "$BASEURL" ] && echo -e "\e[1;31mBASEURL is set\e[0m"
 # make sure if there is an error, we abort
 set -e 
+
+# load scripts
+. $(dirname `realpath scripts/1-pre.sh `)../funcs.sh
 
 # set the release
 subscription-manager release --set=7Server
 
 # only set the repos we need and perform any updates
-rm -f /etc/yum.repos.d/redhat-new.repo
-echo -n "Disabling repos: "
-subscription-manager repos --disable "*" > /tmp/l 2>&1
-cat /tmp/l | wc -l
-subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms
-
-if [ -n "$BASEURL" ] ; then
-  /usr/bin/cp -f /etc/yum.repos.d/redhat.repo /tmp/redhat-new.repo
-  sed -i -e "s%https://cdn.redhat.com/content/%$BASEURL%" -e 's%-rpms]%-rpms-new]%' /tmp/redhat-new.repo
-  yum clean all
-  echo -n "Disabling repos: "
-  subscription-manager repos --disable "*" > /tmp/l 2>&1
-  cat /tmp/l | wc -l
-  mv -f /tmp/redhat-new.repo /etc/yum.repos.d/redhat-new.repo
-fi
+disable_repos
+enable_repos rhel-7-server-rpms rhel-7-server-rh-common-rpms
 
 yum update -y
 
 # add in the satellite repos
-rm -f /etc/yum.repos.d/redhat-new.repo
 if [ -n "$BETA" ] ; then
-  subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms --enable rhel-server-rhscl-7-rpms --enable rhel-server-7-satellite-6-beta-rpms
+  enable_repos rhel-7-server-rpms rhel-7-server-rh-common-rpms rhel-server-rhscl-7-rpms rhel-server-7-satellite-6-beta-rpms
 else
-  subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms --enable rhel-server-rhscl-7-rpms --enable rhel-7-server-satellite-6.2-rpms
-fi
-
-if [ -n "$BASEURL" ] ; then
-  /usr/bin/cp -f /etc/yum.repos.d/redhat.repo /tmp/redhat-new.repo
-  sed -i -e "s%https://cdn.redhat.com/content/%$BASEURL%" -e 's%-rpms]%-rpms-new]%' /tmp/redhat-new.repo
-  yum clean all
-  echo -n "Disabling repos: "
-  subscription-manager repos --disable "*" > /tmp/l 2>&1
-  cat /tmp/l | wc -l
-  mv -f /tmp/redhat-new.repo /etc/yum.repos.d/redhat-new.repo
+  enable_repos rhel-7-server-rpms rhel-7-server-rh-common-rpms rhel-server-rhscl-7-rpms rhel-7-server-satellite-6.2-rpms
 fi
 
 # setup the time

@@ -17,9 +17,11 @@
 # You should have received a copy of the GNU General Public License along with
 # Satellite-install.  If not, see <http://www.gnu.org/licenses/>.
 
-: ${BASEURL:=}
+# make sure if there is an error, we abort
 set -e 
-[ -n "$BASEURL" ] && echo -e "\e[1;31mBASEURL is set\e[0m"
+
+# load scripts
+. $(dirname `realpath scripts/1-pre.sh `)../funcs.sh
 
 rhn_findorg() {
     curl -s -u $RHN_USER:$RHN_PASS -k https://subscription.rhn.redhat.com/subscription/users/$RHN_USER/owners | python -mjson.tool | grep '"key"' | cut -d '"' -f 4
@@ -154,24 +156,9 @@ subscription-manager identity || register_system
 fix_hostname
 fix_ip
 
-rm -f /etc/yum.repos.d/redhat-new.repo
 subscription-manager release --set=7Server
-echo -n "Disabling repos: "
-subscription-manager repos --disable "*" > /tmp/l 2>&1
-cat /tmp/l | wc -l
-echo -n "Enabling repos: "
-subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms > /tmp/l 2>&1
-cat /tmp/l | wc -l
-
-if [ -n "$BASEURL" ] ; then
-  /usr/bin/cp -f /etc/yum.repos.d/redhat.repo /tmp/redhat-new.repo
-  sed -i -e "s%https://cdn.redhat.com/content/%$BASEURL%" -e 's%-rpms]%-rpms-new]%' /tmp/redhat-new.repo
-  yum clean all
-  echo -n "Disabling repos: "
-  subscription-manager repos --disable "*" > /tmp/l 2>&1
-  cat /tmp/l | wc -l
-  mv -f /tmp/redhat-new.repo /etc/yum.repos.d/redhat-new.repo
-fi
+disable_repos
+enable_repos rhel-7-server-rpms rhel-7-server-rh-common-rpms
 
 yum install -y screen git vim bind-utils
 

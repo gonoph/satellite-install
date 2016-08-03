@@ -30,24 +30,38 @@ set -e
 subscription-manager release --set=7Server
 
 # only set the repos we need and perform any updates
+rm -f /etc/yum.repos.d/redhat-new.repo
 subscription-manager repos --disable "*"
 subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms
 
 if [ -n "$BASEURL" ] ; then
-  sed -i 's%https://cdn.redhat.com/content/%http://zfs1.virt.gonoph.net/pulp/content/%' /etc/yum.repos.d/redhat.repo
+  cp -f /etc/yum.repos.d/redhat.repo /tmp
+  sed -i "s%https://cdn.redhat.com/content/%$BASEURL%" /tmp/redhat-new.repo
+  yum clean all
+  echo -n "Disabling repos: "
+  subscription-manager repos --disable "*" > /tmp/l 2>&1
+  cat /tmp/l | wc -l
+  mv -f /tmp/redhat-new.repo /etc/yum.repos.d/redhat-new.repo
 fi
 
 yum update -y
 
 # add in the satellite repos
+rm -f /etc/yum.repos.d/redhat-new.repo
 if [ -n "$BETA" ] ; then
-  subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-server-7-satellite-6-beta-rpms
+  subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms --enable rhel-server-rhscl-7-rpms --enable rhel-server-7-satellite-6-beta-rpms
 else
-  subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-7-server-satellite-6.2-rpms
+  subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms --enable rhel-server-rhscl-7-rpms --enable rhel-7-server-satellite-6.2-rpms
 fi
 
 if [ -n "$BASEURL" ] ; then
-  sed -i 's%https://cdn.redhat.com/content/%http://zfs1.virt.gonoph.net/pulp/content/%' /etc/yum.repos.d/redhat.repo
+  cp -f /etc/yum.repos.d/redhat.repo /tmp
+  sed -i "s%https://cdn.redhat.com/content/%$BASEURL%" /tmp/redhat-new.repo
+  yum clean all
+  echo -n "Disabling repos: "
+  subscription-manager repos --disable "*" > /tmp/l 2>&1
+  cat /tmp/l | wc -l
+  mv -f /tmp/redhat-new.repo /etc/yum.repos.d/redhat-new.repo
 fi
 
 # setup the time

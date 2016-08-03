@@ -1,2 +1,2 @@
-mongodb ALL = (root) NOPASSWD : /usr/sbin/blockdev --setra 32 /dev/mapper/rhel_sat--mongodb-mongodb /dev/sdc
+mongodb ALL = (root) NOPASSWD : /usr/sbin/blockdev --setra 32 /dev/mapper/rhel_sat-mongodb /dev/sdc
 Defaults:mongodb !requiretty

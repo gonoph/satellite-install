@@ -32,7 +32,6 @@ SUDOERS_D:=etc/sudoers.d/mongodb
 SUDOERS_D_INSTALLED:=/etc/sudoers.d/mongodb
 PULP_SOURCES:=alternative.conf
 PULP_SOURCES_INSTALLED:=/etc/pulp/content/sources/conf.d/alternative.conf
-PULP_PATCH:=pulp_rpm-plugins-catalogers-yum.patch
 
 help:
 	@echo "Usage: make (help | install | pre-install-only | install-only | post-install-only | clean"
@@ -53,9 +52,7 @@ pre-install-only: .FORCE_pre-install pre-install
 install-only: .FORCE_install install
 post-install-only: .FORCE_post-install post-install
 
-REAL_PATH_PULP_PATCH:=$(shell realpath $(PULP_PATCH))
-$(PULP_SOURCES_INSTALLED): $(PULP_SOURCES) $(PULP_PATCH)
-	cd / ; patch -p0 < $(REAL_PATH_PULP_PATCH)
+$(PULP_SOURCES_INSTALLED): $(PULP_SOURCES)
 	install $(PULP_SOURCES) $@
 
 $(HAMMER_CONF_INSTALLED): $(HAMMER_CONF)

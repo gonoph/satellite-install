@@ -153,6 +153,8 @@ fix_ip() {
 subscription-manager identity || register_system
 fix_hostname
 fix_ip
+
+rm -f /etc/yum.repos.d/redhat-new.repo
 subscription-manager release --set=7Server
 echo -n "Disabling repos: "
 subscription-manager repos --disable "*" > /tmp/l 2>&1
@@ -162,7 +164,13 @@ subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh
 cat /tmp/l | wc -l
 
 if [ -n "$BASEURL" ] ; then
-  sed -i 's%https://cdn.redhat.com/content/%http://zfs1.virt.gonoph.net/pulp/content/%' /etc/yum.repos.d/redhat.repo
+  cp -f /etc/yum.repos.d/redhat.repo /tmp
+  sed -i "s%https://cdn.redhat.com/content/%$BASEURL%" /tmp/redhat-new.repo
+  yum clean all
+  echo -n "Disabling repos: "
+  subscription-manager repos --disable "*" > /tmp/l 2>&1
+  cat /tmp/l | wc -l
+  mv -f /tmp/redhat-new.repo /etc/yum.repos.d/redhat-new.repo
 fi
 
 yum install -y screen git vim bind-utils

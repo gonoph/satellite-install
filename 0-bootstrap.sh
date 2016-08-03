@@ -164,14 +164,13 @@ subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh
 cat /tmp/l | wc -l
 
 if [ -n "$BASEURL" ] ; then
-  cp -f /etc/yum.repos.d/redhat.repo /tmp
-  sed -i "s%https://cdn.redhat.com/content/%$BASEURL%" /tmp/redhat-new.repo
+  /usr/bin/cp -f /etc/yum.repos.d/redhat.repo /tmp/redhat-new.repo
+  sed -i -e "s%https://cdn.redhat.com/content/%$BASEURL%" -e 's%-rpms]%-rpms-new]%' /tmp/redhat-new.repo
   yum clean all
   echo -n "Disabling repos: "
   subscription-manager repos --disable "*" > /tmp/l 2>&1
   cat /tmp/l | wc -l
   mv -f /tmp/redhat-new.repo /etc/yum.repos.d/redhat-new.repo
-  rm -f /etc/yum.repos.d/redhat.repo
 fi
 
 yum install -y screen git vim bind-utils

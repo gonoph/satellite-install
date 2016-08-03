@@ -21,7 +21,7 @@
 set -e 
 
 # load scripts
-. $(dirname `realpath scripts/1-pre.sh `)../funcs.sh
+. $(dirname `realpath scripts/1-pre.sh `)/../funcs.sh
 
 rhn_findorg() {
     curl -s -u $RHN_USER:$RHN_PASS -k https://subscription.rhn.redhat.com/subscription/users/$RHN_USER/owners | python -mjson.tool | grep '"key"' | cut -d '"' -f 4

@@ -21,7 +21,7 @@
 set -e 
 
 # load scripts
-. $(dirname `realpath scripts/1-pre.sh `)../funcs.sh
+. $(dirname `realpath scripts/1-pre.sh `)/../funcs.sh
 
 # set the release
 subscription-manager release --set=7Server

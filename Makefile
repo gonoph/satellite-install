@@ -91,6 +91,7 @@ endif
 	./$(POST_SCRIPT)
 	touch $@
 
-.FORCE_clean:
+.FORCE_clean: .FORCE_pre-install .FORCE_install .FORCE_post_install
+
 clean: .FORCE_clean
 	./$(CLEAN_SCRIPT)

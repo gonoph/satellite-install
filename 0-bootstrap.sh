@@ -17,7 +17,9 @@
 # You should have received a copy of the GNU General Public License along with
 # Satellite-install.  If not, see <http://www.gnu.org/licenses/>.
 
+: ${BASEURL:=}
 set -e 
+[ -n "$BASEURL" ] && echo -e "\e[1;31mBASEURL is set\e[0m"
 
 rhn_findorg() {
     curl -s -u $RHN_USER:$RHN_PASS -k https://subscription.rhn.redhat.com/subscription/users/$RHN_USER/owners | python -mjson.tool | grep '"key"' | cut -d '"' -f 4
@@ -158,6 +160,11 @@ cat /tmp/l | wc -l
 echo -n "Enabling repos: "
 subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms > /tmp/l 2>&1
 cat /tmp/l | wc -l
+
+if [ -n "$BASEURL" ] ; then
+  sed -i 's%https://cdn.redhat.com/content/%http://zfs1.virt.gonoph.net/pulp/content/%' /etc/yum.repos.d/redhat.repo
+fi
+
 yum install -y screen git vim bind-utils
 
 [ -r satellite-install/.git ] || git clone https://github.com/gonoph/satellite-install.git

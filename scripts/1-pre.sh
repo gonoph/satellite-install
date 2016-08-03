@@ -19,8 +19,10 @@
 
 
 : ${BETA:=}
+: ${BASEURL:=}
 
 [ -n "$BETA" ] && echo -e "\e[1;31mBETA Mode on\e[0m"  || echo -e "\e[1;34mBETA MODE off\e[0m"
+[ -n "$BASEURL" ] && echo -e "\e[1;31mBASEURL is set\e[0m"
 # make sure if there is an error, we abort
 set -e 
 
@@ -37,6 +39,10 @@ if [ -n "$BETA" ] ; then
   subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-server-7-satellite-6-beta-rpms
 else
   subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-server-7-satellite-6.1-rpms
+fi
+
+if [ -n "$BASEURL" ] ; then
+  sed -i 's%https://cdn.redhat.com/content/%http://zfs1.virt.gonoph.net/pulp/content/%' /etc/yum.repos.d/redhat.repo
 fi
 
 # setup the time

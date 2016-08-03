@@ -32,13 +32,18 @@ subscription-manager release --set=7Server
 # only set the repos we need and perform any updates
 subscription-manager repos --disable "*"
 subscription-manager repos --enable rhel-7-server-rpms --enable rhel-7-server-rh-common-rpms
+
+if [ -n "$BASEURL" ] ; then
+  sed -i 's%https://cdn.redhat.com/content/%http://zfs1.virt.gonoph.net/pulp/content/%' /etc/yum.repos.d/redhat.repo
+fi
+
 yum update -y
 
 # add in the satellite repos
 if [ -n "$BETA" ] ; then
   subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-server-7-satellite-6-beta-rpms
 else
-  subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-server-7-satellite-6.1-rpms
+  subscription-manager repos --enable rhel-server-rhscl-7-rpms --enable rhel-7-server-satellite-6.2-rpms
 fi
 
 if [ -n "$BASEURL" ] ; then

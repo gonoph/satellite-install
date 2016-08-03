@@ -17,14 +17,16 @@
 # You should have received a copy of the GNU General Public License along with
 # Satellite-install.  If not, see <http://www.gnu.org/licenses/>.
 
+set -e 
 
-: ${BETA:=}
+# load scripts
+. $(dirname `realpath scripts/1-pre.sh `)/../funcs.sh
+
 : ${SAT_USER:=admin}
 : ${SAT_PASS:=redhat123}
 : ${LOCATION:=Home}
 : ${ORGANIZATION:=Test62}
 
-[ -n "$BETA" ] && echo -e "\e[1;31mBETA Mode on\e[0m"  || echo -e "\e[1;34mBETA MODE off\e[0m"
 # this is the 6.2+ form of the install command
 
     #--foreman-proxy-puppetca true \

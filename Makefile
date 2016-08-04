@@ -93,5 +93,9 @@ endif
 
 .FORCE_clean: .FORCE_pre-install .FORCE_install .FORCE_post_install
 
-clean: .FORCE_clean
+clean: $(CLEAN_SCRIPT) .FORCE_clean
+
+.FORCE_clean_script:
+
+$(CLEAN_SCRIPT): .FORCE_clean_script
 	./$(CLEAN_SCRIPT)

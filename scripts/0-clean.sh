@@ -21,6 +21,7 @@
 read -p "This has not been fully tested, and there is no roll back, are you sure? (yes/NO) " JUNK
 [ "x${JUNK,,}" = "xyes" ] || exit 1
 
+systemctl daemon-reload
 katello-service stop
 systemctl stop postgresql mongod qpidd httpd puppet
 systemctl stop postgresql mongod qpidd httpd puppet
@@ -42,6 +43,10 @@ yum -y autoremove \
 	foreman-discovery-image.noarch \
 	httpd \
 	foreman \
+	foreman-proxy \
+	puppet \
 	pulp-admin-client
+yum autoremove -y $(rpm -qa | grep qpid) $(rpm -qa | grep katello) $(rpm -qa | grep $(hostname)) rh-ruby22-runtime
+yum autoremove -y
 rm /etc/candlepin/ /var/lib/foreman /var/lib/puppet -rfv /etc/httpd /etc/puppet /etc/foreman /etc/foreman-proxy
 sync

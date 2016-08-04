@@ -8,4 +8,4 @@
 /dev/mapper/rhel_sat-mongodb		/var/lib/mongodb        xfs     defaults,discard      0 0
 
 # pulp is about 20G
-/dev/mapper/rhel_sat-pulp		/var/lib/mongodb        xfs     defaults,discard      0 0
+/dev/mapper/rhel_sat-pulp		/var/lib/pulp        xfs     defaults,discard      0 0

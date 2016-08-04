@@ -90,13 +90,6 @@ if [ "$SECTION" = "all" -o "$SECTION" = "repos" ] ; then
     hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Enterprise Linux 7 Server (RPMs)'
     hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Enterprise Linux 7 Server (Kickstart)'
     hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Enterprise Linux 7 Server - RH Common (RPMs)'
-    if [ -z "$BETA" ] ; then
-        info "Enabling non-beta repos"
-        hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Enterprise Linux 7 Server - Optional (RPMs)'
-        hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)'
-        hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Storage Native Client for RHEL 7 (RPMs)'
-        hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'RHN Tools for Red Hat Enterprise Linux 7 Server (RPMs)'
-    fi
     info "Enabling extra repos"
     RELEASE=""
     hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Enterprise Linux 7 Server - Extras (RPMs)'
@@ -104,17 +97,17 @@ if [ "$SECTION" = "all" -o "$SECTION" = "repos" ] ; then
         info "Enabling satellite tools beta"
         hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Satellite Tools 6 Beta (for RHEL 7 Server) (RPMs)'
     else
-        info "Enabling satellite tools 6.1"
-        hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Satellite Tools 6.1 (for RHEL 7 Server) (RPMs)'
+        info "Enabling satellite tools 6.2"
+        hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Satellite Tools 6.2 (for RHEL 7 Server) (RPMs)'
     fi
 fi
 
 if [ "$SECTION" = "all" -o "$SECTION" = "satellite" ] ; then
     RELEASE=""
     if [ -z "$BETA" ] ; then
-        info "Enabling satellite repos for 6.1"
+        info "Enabling satellite repos for 6.2"
         PRODUCT='--product=Red Hat Satellite'
-        hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Satellite 6.1 (for RHEL 7 Server) (RPMs)'
+        hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Satellite 6.2 (for RHEL 7 Server) (RPMs)'
     else
         info "Enabling satellite beta repos"
         PRODUCT='--product=Red Hat Satellite 6 Beta'

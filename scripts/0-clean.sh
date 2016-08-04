@@ -36,12 +36,10 @@ rm /root/ssl-build/ -rfv
 sync
 
 yum -y autoremove \
-	katello \
+	satellite \
+	bind-utils \
+	pulp-admin-client
 	foreman-discovery-image.noarch \
-	rubygem-smart_proxy_discovery.noarch \
-	rubygem-smart_proxy_discovery_image.noarch \
-	tfm-rubygem-foreman_discovery.noarch \
-	tfm-rubygem-hammer_cli_foreman_discovery.noarch \
 	httpd \
 	foreman \
 	pulp-admin-client

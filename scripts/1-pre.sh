@@ -59,13 +59,8 @@ firewall-cmd --permanent --add-port="53/udp" --add-port="53/tcp" \
 
 # actually install katello / satellite
 yum -y install \
-	katello \
+	satellite \
 	bind-utils \
-	foreman-discovery-image.noarch \
-	rubygem-smart_proxy_discovery.noarch \
-	rubygem-smart_proxy_discovery_image.noarch \
-	tfm-rubygem-foreman_discovery.noarch \
-	tfm-rubygem-hammer_cli_foreman_discovery.noarch \
 	pulp-admin-client
 
 # make sure the permissions are set in case we mounted special directories

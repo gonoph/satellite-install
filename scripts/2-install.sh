@@ -31,13 +31,16 @@ set -e
 
     #--foreman-proxy-puppetca true \
     # --foreman-proxy-tftp true \
-  foreman-installer --scenario katello \
+  satellite-installer --scenario satellite -v \
+    --foreman-initial-location $LOCATION \
+    --foreman-initial-organization $ORGANIZATION \
     --foreman-admin-username $SAT_USER \
     --foreman-admin-password $SAT_PASS \
     --capsule-puppet true \
-    --foreman-initial-location $LOCATION \
-    --foreman-initial-organization $ORGANIZATION \
-    --enable-foreman-plugin-remote-execution \
-    --enable-foreman-plugin-templates \
-    --enable-foreman-proxy-plugin-remote-execution-ssh \
-    --enable-foreman-plugin-hooks
+    --foreman-proxy-puppetca true \
+    --foreman-proxy-tftp true \
+    --enable-foreman-plugin-discovery
+# --enable-foreman-plugin-remote-execution \
+# --enable-foreman-plugin-templates \
+# --enable-foreman-proxy-plugin-remote-execution-ssh \
+    # --enable-foreman-plugin-hooks

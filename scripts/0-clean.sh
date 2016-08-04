@@ -38,7 +38,7 @@ sync
 yum -y autoremove \
 	satellite \
 	bind-utils \
-	pulp-admin-client
+	pulp-admin-client \
 	foreman-discovery-image.noarch \
 	httpd \
 	foreman \

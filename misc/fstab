@@ -2,9 +2,10 @@
 
 # I mount "discard" as I use thin volumes, and I also like to reclaim the space on the real medium
 # var is about 10G
-/dev/mapper/rhel_sat--62-var			/var                    xfs     defaults,discard      0 0
-# mongodb is about 20G, but it's a different volume due to the read ahead settings
-/dev/mapper/rhel_sat--mongodb-mongodb		/var/lib/mongodb        xfs     defaults,discard      0 0
+/dev/mapper/rhel_sat-var			/var                    xfs     defaults,discard      0 0
 
-# NFS mount pulp, because I dedup my pulp repos across multiple satellite installs
-zfs1:/ext/pulp-repos/sat2       /var/lib/pulp           nfs     defaults,sec=sys,nfsvers=4.1 0 0
+# mongodb is about 10G, but it's a different volume due to the read ahead settings
+/dev/mapper/rhel_sat-mongodb		/var/lib/mongodb        xfs     defaults,discard      0 0
+
+# pulp is about 20G
+/dev/mapper/rhel_sat-pulp		/var/lib/mongodb        xfs     defaults,discard      0 0

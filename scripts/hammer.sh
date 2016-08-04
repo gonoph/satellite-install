@@ -82,7 +82,7 @@ fi
 
 ## RHEL Repos
 PRODUCT='--product=Red Hat Enterprise Linux Server'
-RELEASE="--releasever=7.2"
+RELEASE="--releasever=7Server"
 BASEARCH="--basearch=x86_64"
 
 if [ "$SECTION" = "all" -o "$SECTION" = "repos" ] ; then

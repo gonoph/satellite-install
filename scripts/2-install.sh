@@ -29,16 +29,14 @@ set -e
 
 # this is the 6.2+ form of the install command
 
-    #--foreman-proxy-puppetca true \
-    # --foreman-proxy-tftp true \
+#    --foreman-proxy-tftp true \
+#    --foreman-proxy-puppetca true \
+#    --enable-foreman-plugin-discovery \
+#    --enable-foreman-plugin-remote-execution \
+#    --enable-foreman-proxy-plugin-remote-execution-ssh
   satellite-installer --scenario satellite -v --force \
     --foreman-initial-location $LOCATION \
     --foreman-initial-organization $ORGANIZATION \
     --foreman-admin-username $SAT_USER \
     --foreman-admin-password $SAT_PASS \
-    --capsule-puppet true \
-    --foreman-proxy-puppetca true \
-    --foreman-proxy-tftp true \
-    --enable-foreman-plugin-discovery \
-    --enable-foreman-plugin-remote-execution \
-    --enable-foreman-proxy-plugin-remote-execution-ssh
+    --capsule-puppet true

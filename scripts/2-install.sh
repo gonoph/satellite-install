@@ -31,7 +31,7 @@ set -e
 
     #--foreman-proxy-puppetca true \
     # --foreman-proxy-tftp true \
-  satellite-installer --scenario satellite -v \
+  satellite-installer --scenario satellite -v --force \
     --foreman-initial-location $LOCATION \
     --foreman-initial-organization $ORGANIZATION \
     --foreman-admin-username $SAT_USER \
@@ -39,8 +39,6 @@ set -e
     --capsule-puppet true \
     --foreman-proxy-puppetca true \
     --foreman-proxy-tftp true \
-    --enable-foreman-plugin-discovery
-# --enable-foreman-plugin-remote-execution \
-# --enable-foreman-plugin-templates \
-# --enable-foreman-proxy-plugin-remote-execution-ssh \
-    # --enable-foreman-plugin-hooks
+    --enable-foreman-plugin-discovery \
+    --enable-foreman-plugin-remote-execution \
+    --enable-foreman-proxy-plugin-remote-execution-ssh

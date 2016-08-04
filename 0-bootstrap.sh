@@ -65,7 +65,9 @@ register_system() {
         fi
     fi
     if [ -n "$RHN_OLD_SYSTEM" ] && [ -n "$RHN_USER" ] ; then
-        subscription-manager register --consumerid=$RHN_OLD_SYSTEM --username=$RHN_USER
+        local PASS=""
+        [ -n "$RHN_PASS" ] && PASS="--password=$RHN_PASS"
+        subscription-manager register --consumerid=$RHN_OLD_SYSTEM --username=$RHN_USER $PASS
         return
     fi
     cat<<EOF

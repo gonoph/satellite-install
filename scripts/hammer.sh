@@ -17,6 +17,9 @@
 # You should have received a copy of the GNU General Public License along with
 # Satellite-install.  If not, see <http://www.gnu.org/licenses/>.
 
+BASEURL=
+# load scripts
+source $(dirname `realpath $0`)/../0-bootstrap.sh
 
 : ${BETA:=}
 : ${ORG:=1}
@@ -39,18 +42,9 @@ function hammer_enable() {
     hammer repository-set enable "${ORG}" "${PRODUCT}" $ARGS --name="$NAME"
 }
 
-info() {
-    echo -e "\e[0;34m*\e[32m" "$@" "\e[0m"
-}
-
-warn() {
-    echo -e "\e[1;33mWarning:\e[0;32m" "$@" "\e[0m"
-}
-
 SECTION=$1
 : ${SECTION:=-h}
 
-[ -n "$BETA" ] && echo -e "\e[1;31mBETA Mode on\e[0m"  || echo -e "\e[1;34mBETA MODE off\e[0m"
 case $SECTION in
     --help|-h)
         cat<<EOF
@@ -61,16 +55,16 @@ EOF
 esac
 
 if [ "$SECTION" = "manifest" ] ; then
-    info "Uploading manifest info \e[1;33m$(hostname)"
+    info "Uploading manifest info $H$(hostname)"
     FILE=$2
     : ${FILE:=/tmp/manifest.zip}
     while [ ! -r $FILE ] ; do
-        warn "Unable to read: \e[0;33m$FILE"
+        warn "Unable to read: $H$FILE"
         # if it's not interactive then exit
         [ -n "$2" ] && exit 1
         read -ep "Path to manifest: " -i "$FILE" FILE
         if [ "$(basename $FILE .zip)" = "$FILE" ] ; then
-            warn "File doesn't have .zip extension: \e[1;33m$FILE"
+            warn "File doesn't have .zip extension: $H$FILE"
             FILE=$(rev <<< "$FILE" | cut -d . -f 2- | rev)
         fi
     done
@@ -86,7 +80,7 @@ RELEASE="--releasever=7Server"
 BASEARCH="--basearch=x86_64"
 
 if [ "$SECTION" = "all" -o "$SECTION" = "repos" ] ; then
-    info "Enabling repos for \e[1;33m$PRODUCT"
+    info "Enabling repos for $H$PRODUCT"
     hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Enterprise Linux 7 Server (RPMs)'
     hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Enterprise Linux 7 Server (Kickstart)'
     hammer_enable "$ORG" "$PRODUCT" "$BASEARCH" "$RELEASE" 'Red Hat Enterprise Linux 7 Server - RH Common (RPMs)'
@@ -154,22 +148,22 @@ if [ "$SECTION" = "all" -o "$SECTION" = "sync" ]; then
         fi
     done
     PRODUCT="Red Hat Enterprise Linux Server"
-    info "Must synchronize kickstart before anything else for: \e[1m$PRODUCT"
+    info "Must synchronize kickstart before anything else for: $H$PRODUCT"
     AVAIL=$(hammer --csv repository list ${ORG} --product="$PRODUCT" | tail -n +2 | grep -i kickstart | tail -n 1) # there can be only one
     if [ -z "$AVAIL" ] ; then
-        warn "Unable to find kickstart repository! Have you: \e[1mUploaded manifests or created repos?"
+        warn "Unable to find kickstart repository! Have you: $HUploaded manifests or created repos?"
         exit 1
     fi
     IFS=, read ID NAME PROD TYPE URI <<< "$AVAIL"
-    info "Synchronizing: \e[1m$NAME"
+    info "Synchronizing: $H$NAME"
     hammer repository synchronize --product="$PROD" ${ORG} --id=$ID
 
-    info "Synchronizing all the other repos for: \e[1m$PRODUCT"
+    info "Synchronizing all the other repos for: $H$PRODUCT"
     # the reason for this strange create-a-script is due to hammer trying to access the tty via stty, and spamming the console with stty errors
     >/tmp/l
     hammer --csv repository list ${ORG} --product="$PRODUCT" | tail -n +2 | grep -v -i kickstart | while IFS=, read ID NAME PROD TYPE URI ; do
         echo 'cat<<EOF' >> /tmp/l
-        info "   Syncing: \e[1m$NAME" >> /tmp/l
+        info "   Syncing: $H$NAME" >> /tmp/l
         echo 'EOF' >> /tmp/l
         echo "hammer repository synchronize --product='$PROD' '${ORG}' --id=$ID" >> /tmp/l
     done
@@ -182,11 +176,11 @@ fi
 
 if [ "$SECTION" = "all" -o "$SECTION" = "view" ] ; then
     PRODUCT="--product=Red Hat Enterprise Linux Server"
-    info "Creating content view for \e[1;33m$PRODUCT"
+    info "Creating content view for $H$PRODUCT"
     # Create a content view for RHEL 7 server x86_64:
     hammer content-view create --name='rhel-7-server-x86_64-cv' ${ORG}
     hammer --csv repository list ${ORG} "${PRODUCT}" | tail -n +2 | while IFS="," read I N P C U ; do
-        info " Attaching \e[1;33m$N"
+        info " Attaching $H$N"
         hammer content-view add-repository --name='rhel-7-server-x86_64-cv' ${ORG} --repository-id=${I}
     done
 fi
@@ -203,16 +197,16 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
     info "Making sure default domain belongs to the default location and org"
     ID=$(hammer --csv domain list --search=name=$(hostname -d) | tail -n +2 | cut -d, -f 1)
     if [ -z "$ID" ] ; then
-        warn "Unable to locate default domain: \e[1m$(hostname -d)" 
+        warn "Unable to locate default domain: $H$(hostname -d)" 
         exit 1
     fi
     hammer domain update --id=$ID --location-ids=$LOC --organization-ids=$_ORG
 
     HOSTNAME=$(hostname)
-    info "Provisioning: setting default location and org for host \e[1m$HOSTNAME"
+    info "Provisioning: setting default location and org for host $H$HOSTNAME"
     MY_ID=$(hammer --csv host list --search=name=$HOSTNAME | tail -n +2 | cut -d, -f 1)
     if [ -z "$MY_ID" ] ; then
-        warn "Unable to locate host-id for \e[1m$HOSTNAME"
+        warn "Unable to locate host-id for $H$HOSTNAME"
         exit 1
     fi
     hammer host update --id=$MY_ID --location-id=$LOC $ORG
@@ -220,10 +214,10 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
     info "Making sure the default puppet environment has the default location and org"
     DEFAULT_PUPPET=$(hammer --csv environment info --id=1 | tail -n +2 | cut -d, -f 2)
     if [ -z "$DEFAULT_PUPPET" ] ; then
-        warn "Unable to locate puppet environment with \e[1m--id=1"
+        warn "Unable to locate puppet environment with $H--id=1"
         exit 1
     fi
-    info "Setting default location and org for Default puppet environment \e[1m$DEFAULT_PUPPET"
+    info "Setting default location and org for Default puppet environment $H$DEFAULT_PUPPET"
     hammer environment update --location-ids=$LOC --organization-ids=$_ORG --id=1
 
     info "Provisioning setting: subnet"
@@ -260,17 +254,17 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
     info "Determining medium for kickstart"
     LABEL=$(hammer --output=yaml organization info --id=$_ORG | grep ^Label | cut -d ' ' -f 2)
     if [ -z "$LABEL" ] ; then
-        warn "Unable to locate name for organization-id: \e[1m$_ORG"
+        warn "Unable to locate name for organization-id: $H$_ORG"
         exit 1
     fi
-    info "Looking for kickstart with patterns: \e[1mKickstart $LABEL"
+    info "Looking for kickstart with patterns: $HKickstart $LABEL"
     MEDIUM=$(hammer --csv medium list | grep Kickstart | grep $LABEL | cut -d , -f 1,2)
     if [ -z "$MEDIUM" ] ; then
         warn "Unable to locate medium for kickstart"
         exit 1
     fi
     IFS=, read ID NAME URL <<< "$MEDIUM"
-    info "Found kickstart medium \e[1m[$ID] $NAME"
+    info "Found kickstart medium $H[$ID] $NAME"
 
     info "Provisioning setting: hostgroup"
     hammer hostgroup create --name=RHEL7-Server --organization-ids=${_ORG} --architecture=x86_64 --domain=$(hostname -d) --environment=production --medium-id=$ID --operatingsystem='RedHat 7.2' --partition-table='Kickstart default' --puppet-ca-proxy-id=1 --puppet-proxy-id=1 --subnet=$(hostname -d) --root-pass=redhat123
@@ -283,7 +277,7 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
     if [ -n "$BETA" ] ; then
         hammer activation-key content-override --name=RHEL7-BASE --value=1 ${ORG} --content-label=rhel-7-server-satellite-tools-6-beta-rpms
     else
-        hammer activation-key content-override --name=RHEL7-BASE --value=1 ${ORG} --content-label=rhel-7-server-satellite-tools-6.1-rpms
+        hammer activation-key content-override --name=RHEL7-BASE --value=1 ${ORG} --content-label=rhel-7-server-satellite-tools-6.2-rpms
     fi
     hammer activation-key content-override --name=RHEL7-BASE --value=1 ${ORG} --content-label=rhel-7-server-rh-common-rpms
 
@@ -291,10 +285,18 @@ if [ "$SECTION" = "all" -o "$SECTION" = "provisioning" ] ; then
     hammer hostgroup set-parameter --hostgroup=RHEL7-Server --name=kt_activation_keys --value=RHEL7-BASE
 
     info "Remastering PXE-less discovery image"
-    if [ -r /usr/share/foreman-discovery-image/auto-foreman-discovery-image-3.1.1-13.iso ] ; then
-        info "Already exists: \e[1m/usr/share/foreman-discovery-image/auto-foreman-discovery-image-3.1.1-13.iso"
+    ISO=$(rpm -ql foreman-discovery-image | grep iso$)
+    if [ -r "$ISO" ] ; then
+      DN=$(dirname $ISO)
+      BN=$(basename $ISO)
+      DST="$DN/auto-$BN"
+      if [ -r $DST ] ; then
+        info "$DST already exists!"
+      else
+	discovery-remaster "$ISO" "proxy.url=https://$HOSTNAME:9090 proxy.type=proxy fdi.pxauto=1" "$DST" >/tmp/l 2>&1
+	[ -r $DST ] && info "Stored in $H$DN/auto-$BN" || cat /tmp/l
+      fi
     else
-        discovery-remaster /usr/share/foreman-discovery-image/foreman-discovery-image-3.1.1-13.iso "proxy.url=https://$HOSTNAME:9090 proxy.type=proxy fdi.pxauto=1" /usr/share/foreman-discovery-image/auto-foreman-discovery-image-3.1.1-13.iso 2>/dev/null
-        info "Stored in \e[1m/usr/share/foreman-discovery-image/auto-foreman-discovery-image-3.1.1-13.iso"
+      warn "Unable to locate iso for foreman-discovery-image"
     fi
 fi

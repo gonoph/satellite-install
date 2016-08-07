@@ -20,7 +20,7 @@
 set -e 
 
 # load scripts
-. $(dirname `realpath scripts/1-pre.sh `)/../funcs.sh
+source $(dirname `realpath $0`)/../0-bootstrap.sh
 
 : ${SAT_USER:=admin}
 : ${SAT_PASS:=redhat123}
@@ -39,4 +39,8 @@ set -e
     --foreman-initial-organization $ORGANIZATION \
     --foreman-admin-username $SAT_USER \
     --foreman-admin-password $SAT_PASS \
-    --capsule-puppet true
+    --foreman-proxy-tftp true \
+    --foreman-plugin-discovery-install-images true \
+    --capsule-puppet true \
+    --foreman-proxy-puppetca true \
+    --enable-foreman-plugin-discovery

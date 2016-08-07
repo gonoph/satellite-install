@@ -18,7 +18,10 @@
 # Satellite-install.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# this is from the install doc to secure the foreman ports
+# load scripts
+source $(dirname `realpath $0`)/../0-bootstrap.sh
+
+info "perform firewall steps from install doc to secure the foreman ports"
 firewall-cmd --direct --add-rule ipv4 filter OUTPUT 0 -o lo -p tcp -m tcp --dport 9200 -m owner --uid-owner foreman -j ACCEPT \
 && firewall-cmd --direct --add-rule ipv6 filter OUTPUT 0 -o lo -p tcp -m tcp --dport 9200 -m owner --uid-owner foreman -j ACCEPT \
 && firewall-cmd --direct --add-rule ipv4 filter OUTPUT 0 -o lo -p tcp -m tcp --dport 9200 -m owner --uid-owner root -j ACCEPT \
@@ -40,7 +43,7 @@ Let's ask pulp to initialize that.
 
 You can watch the progress in another window by:
 
-  # journalctl SYSLOG_IDENTIFIER=pulp -f --since='1 minutes ago'
+  $H# journalctl SYSLOG_IDENTIFIER=pulp -f --since='1 minutes ago'$h
 
 EOF
   pulp-admin  -u admin -p $(grep ^default_pass /etc/pulp/server.conf | cut -d ' ' -f 2) content sources refresh --bg

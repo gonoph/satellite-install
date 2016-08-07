@@ -21,7 +21,7 @@
 set -e 
 
 # load scripts
-. $(dirname `realpath scripts/1-pre.sh `)/../funcs.sh
+source $(dirname `realpath $0`)/../0-bootstrap.sh
 
 # set the release
 set_release
@@ -30,38 +30,39 @@ set_release
 disable_repos
 enable_repos rhel-7-server-rpms rhel-7-server-rh-common-rpms
 
+info "Updating system"
 yum update -y
 
-# add in the satellite repos
+info "add in the satellite repos"
 if [ -n "$BETA" ] ; then
   enable_repos rhel-7-server-rpms rhel-7-server-rh-common-rpms rhel-server-rhscl-7-rpms rhel-server-7-satellite-6-beta-rpms
 else
   enable_repos rhel-7-server-rpms rhel-7-server-rh-common-rpms rhel-server-rhscl-7-rpms rhel-7-server-satellite-6.2-rpms
 fi
 
-# setup the time
+info "setup the time"
 yum erase -y ntp ntpdate
 yum install chrony -y
 systemctl enable chronyd
 systemctl start chronyd
 
-# open up the firewall
+info "open up the firewall"
 firewall-cmd --add-port="53/udp" --add-port="53/tcp" \
  --add-port="67/udp" --add-port="68/udp" \
  --add-port="69/udp" --add-port="80/tcp" \
  --add-port="443/tcp" --add-port="5647/tcp" \
- --add-port="8140/tcp"
+ --add-port="8140/tcp" --add-port="9090/tcp"
 firewall-cmd --permanent --add-port="53/udp" --add-port="53/tcp" \
  --add-port="67/udp" --add-port="68/udp" \
  --add-port="69/udp" --add-port="80/tcp" \
  --add-port="443/tcp" --add-port="5647/tcp" \
- --add-port="8140/tcp"
+ --add-port="8140/tcp" --add-port="9090/tcp"
 
-# actually install katello / satellite
+info "actually install katello / satellite"
 yum -y install \
 	satellite \
 	bind-utils \
 	pulp-admin-client
 
-# make sure the permissions are set in case we mounted special directories
+info "make sure the permissions are set in case we mounted special directories"
 restorecon -Rv /var

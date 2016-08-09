@@ -20,7 +20,7 @@
 set -e 
 
 # load scripts
-source $(dirname `realpath $0`)/../0-bootstrap.sh
+source $(dirname `realpath $BASH_SOURCE`)/../0-bootstrap.sh
 
 : ${SAT_USER:=admin}
 : ${SAT_PASS:=redhat123}

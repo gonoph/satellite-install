@@ -19,7 +19,7 @@
 
 
 # load scripts
-source $(dirname `realpath $0`)/../0-bootstrap.sh
+source $(dirname `realpath $BASH_SOURCE`)/../0-bootstrap.sh
 
 info "perform firewall steps from install doc to secure the foreman ports"
 firewall-cmd --direct --add-rule ipv4 filter OUTPUT 0 -o lo -p tcp -m tcp --dport 9200 -m owner --uid-owner foreman -j ACCEPT \

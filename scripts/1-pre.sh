@@ -21,7 +21,7 @@
 set -e 
 
 # load scripts
-source $(dirname `realpath $0`)/../0-bootstrap.sh
+source $(dirname `realpath $$BASH_SOURCE`)/../0-bootstrap.sh
 
 # set the release
 set_release
@@ -62,7 +62,9 @@ info "actually install katello / satellite"
 yum -y install \
 	satellite \
 	bind-utils \
-	pulp-admin-client
+	pulp-admin-client \
+	pulp-rpm-admin-extensions \
+       	pulp-rpm-handlers
 
 info "make sure the permissions are set in case we mounted special directories"
 restorecon -Rv /var

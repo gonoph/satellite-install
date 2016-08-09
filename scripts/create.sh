@@ -46,7 +46,7 @@ case $1 in
     do_action
     exit 0 ;;
   template)
-    source $_BASE/create/template.sh
+    source $_BASE/create/do_template.sh
     do_action
     exit 0 ;;
   *)

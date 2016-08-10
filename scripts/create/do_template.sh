@@ -94,7 +94,7 @@ while [ $I -gt 0 ] ; do
     grep -q '        <state>down</state>' /tmp/l && break
   fi
   I=$[ $I - 1 ]
-  sleep 3
+  sleep 5
   info "$(date)"
 done
 
@@ -136,7 +136,7 @@ local STATE=$( ovirt /vms/$VMS_ID/start -H "Content-type: application/xml" -d @/
     info "hammer host update --hostgroup=$HG --name $HOST --managed yes"
     exit 1
   fi
-  info "Updating $HOST to $HG"
+  info "Updating $HOST to Host Group: $H$HG"
   hammer host update --hostgroup="$HG" --name $HOST --managed yes
 }
 

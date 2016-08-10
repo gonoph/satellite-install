@@ -21,7 +21,17 @@ EOF
     check_blank STATE
     warn "STATE=$STATE"
     info "Deleting host"
-    STATE=$( ovirt /vms/$VMS_ID -X DELETE | grep state | shtml | tr -d ' ' | grep complete )
+    local I=10
+    set +e
+    while [ $I -gt 0 ] ; do
+      ovirt /vms/$VMS_ID -X DELETE | grep state | shtml | tr -d ' ' | grep complete > /tmp/xx
+      [ -s /tmp/xx ] && break
+      I=$[ $I - 1 ]
+      grep detail /tmp/l
+      sleep 5
+      info "$(date)"
+    done
+    STATE=$(cat /tmp/xx ; rm -f /tmp/xx)
     check_blank STATE
     warn "STATE=$STATE"
   done

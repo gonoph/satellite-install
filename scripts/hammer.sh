@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License along with
 # Satellite-install.  If not, see <http://www.gnu.org/licenses/>.
 
-BASEURL=
 # load scripts
 _BASE=$(dirname `realpath $BASH_SOURCE`)
 source $_BASE/../0-bootstrap.sh

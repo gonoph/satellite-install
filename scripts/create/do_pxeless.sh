@@ -58,7 +58,7 @@ EOF
   while [ $I -gt 0 ] ; do
 	  ovirt /vms/$VMS_ID/disks/$DISK_ID | grep state | grep -q ok && break
 	  I=$[ $I - 1 ]
-	  sleep 3
+	  sleep 5
 	  info "$(date)"
   done
 
@@ -69,7 +69,7 @@ EOF
 
   set -e
 
-  info "Starting VM to boot from network"
+  info "Starting VM to boot from disc"
   cat <<EOF > /tmp/x
   <action/>
 EOF

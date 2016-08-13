@@ -26,7 +26,7 @@ MONTHS_ADD=4
 source $_BASE/hammer/do_view.sh
 
 do_action() {
-  # views
+  views
   errata
 }
 

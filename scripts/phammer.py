@@ -92,6 +92,8 @@ class SatelliteInit(object):
     def args(self):
 	return self.parser.parse_args()
 
-init = SatelliteInit()
-args = init.args()
-args.section.do(args)
+# init = SatelliteInit()
+# args = init.args()
+# args.section.do(args)
+
+

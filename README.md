@@ -4,7 +4,7 @@ Collection of scripts that aid in installing Red Hat Satellite 6.1 and 6.2 Beta
 ## OVERVIEW OF USAGE
 by Billy Holmes <billy@gonoph.net>
 
-These are scripts I wrote to help me install and configure a Satellite 6.1/6.2 Beta server. There is a bootstrap script that aids in getting the server to the point where you can checkout the repo and start the make process.
+These are scripts I wrote to help me install and configure a Satellite 6.2 GA server. There is a bootstrap script that aids in getting the server to the point where you can checkout the repo and start the make process.
 
 The *Makefile* performs the actual package and install, but even after the server is configured, there are a lot of things left.
 
@@ -49,40 +49,30 @@ You can change these assumptions by editing these files to suit your needs:
 
 ### Using the hammer script
 
-Ater the installation of the server, you will need to further configure it with your manifest, your repos, subnets, sync plans, and a bunch of other things that are outlined in the install guide. To configure a sample version of these things, you can the *hammer.sh* command which has the following help:
+Ater the installation of the server, you will need to further configure it with your manifest, your repos, subnets, sync plans, and a bunch of other things that are outlined in the install guide. To configure a sample version of these things, you can run the *hammer.sh* command which has the following help:
 
-    $ BETA=1 scripts/hammer.sh
-    BETA Mode on
+    $ scripts/hammer.sh
     usage: ./scripts/hammer.sh (manifest (FILE) | all | -h | --help | repos | satellite | repos-extra | sync | view | publish | provisioning)
 
 The 1st thing you will do, is install your manifest, repos, then satellite repos (if needed), extra repos, sync plans, content views, publish it, then set it up for provisioning. The script assumes these defaults:
 
-    BETA=
     ORG=1
     LOC=2
 
-Here is an example using the 6.2 BETA mode.
+Here is an example:
 
-    export BETA=1
     scripts/hammer.sh manifest /tmp/manifest.zip
     scripts/hammer.sh repos
-    scripts/hammer.sh repos-extra
     scripts/hammer.sh sync
     scripts/hammer.sh view
     scripts/hammer.sh publish
     scripts/hammer.sh provisioning
 
-There's a timeout bug in the manifest import for 6.2 beta (even from the UI), so if that happens, you'll need to do a:
-
-    hammer subscription delete-manifest --organization-id=1
-
-And then perform the manifest import above. Bugzilla: [https://bugzilla.redhat.com/show_bug.cgi?id=1334383]
-
 ### Provision a system
 
-After all the steps have been ran, you should then be able to provision a system. If you are running RHEV, there is a sample script called *create.sh* that can help you do this. All it needs to some environment varibles set, or it will use its defaults:
+After all the steps have been ran, you should then be able to provision a system. If you are running RHEV, there is a sample script called *provision* that can help you do this. All it needs to some environment varibles set, or it will use its defaults:
 
-    HOST=sat-62.virt.gonoph.net
+    HOST=client1.virt.gonoph.net
     HG=RHEL7-Server
     IP=#from host lookup#
     ORG=1
@@ -92,10 +82,10 @@ After all the steps have been ran, you should then be able to provision a system
 
 Once you setup the env variables to match your environment, just run the script:
 
-    scripts/create.sh
+    scripts/provision
 
 When you are done with the system, or wish to start again, run it with clean:
 
-    scripts/create.sh clean
+    scripts/provision clean
 
 The script will create a RHEVM virtual machine, grab the mac, create the satellite host, populate the mac, and tell RHEV to start the VM using PXE to have it kickstart a satellite install.

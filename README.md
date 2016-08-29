@@ -1,5 +1,5 @@
 # satellite-install
-Collection of scripts that aid in installing Red Hat Satellite 6.1 and 6.2 Beta
+Collection of scripts that aid in installing Red Hat Satellite 6.2 GA
 
 ## OVERVIEW OF USAGE
 by Billy Holmes <billy@gonoph.net>

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Satellite-install create provisioning script - to aid in the provisioning of kickstart hosts
+# Satellite-install provisioning script - to aid in the provisioning of kickstart hosts
 # Copyright (C) 2016  Billy Holmes <billy@gonoph.net>
 # 
 # This file is part of Satellite-install.
@@ -19,7 +19,7 @@
 
 # load scripts
 _BASE=$(dirname `realpath $BASH_SOURCE`)
-source $_BASE/create-funcs.sh
+source $_BASE/provision-funcs.sh
 
 set -e  -E
 
@@ -27,26 +27,36 @@ do_help() {
   info "Usage: \e[1m$0 (ks | pxeless | template)"
   info "Current Default Host: $H$HOST"
   info "$H  ks       $h- create PXE kickstart VM"
+  info "$H  atomic   $h- create PXE Atomic Host kickstart VM"
   info "$H  pxeless  $h- create PXEless discovery VM with ISO ($H$PXELESS_ISO$h)"
   info "$H  template $h- create unregistered system from RHEL template ($H$RHEL_TEMPLATE$h)"
   info "$H  clean    $h- clean the current host from satellite and RHEVM"
   exit 1
 }
+
+[ $# -lt 1 ] && do_help
+
+[ "$RHEVM_PASS" = "changeme" -o -z "$RHEVM_PASS" ] && err "You need to define ${H}RHEVM_PASS"
+
 case $1 in
   clean) 
-    source $_BASE/create/do_clean.sh
+    source $_BASE/provision-lib/do_clean.sh
     do_action
     exit 0 ;;
   ks)
-    source $_BASE/create/do_ks.sh
+    source $_BASE/provision-lib/do_ks.sh
     do_action
     exit 0 ;;
   pxeless)
-    source $_BASE/create/do_pxeless.sh
+    source $_BASE/provision-lib/do_pxeless.sh
     do_action
     exit 0 ;;
   template)
-    source $_BASE/create/do_template.sh
+    source $_BASE/provision-lib/do_template.sh
+    do_action
+    exit 0 ;;
+  atomic)
+    source $_BASE/provision-lib/do_atomic.sh
     do_action
     exit 0 ;;
   *)

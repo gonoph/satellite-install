@@ -1,4 +1,21 @@
 #!/bin/sh
+# Satellite-install template based provisioning script - to aid in the provisioning of kickstart hosts
+# Copyright (C) 2016  Billy Holmes <billy@gonoph.net>
+# 
+# This file is part of Satellite-install.
+# 
+# Satellite-install is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+# 
+# Satellite-install is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# Satellite-install.  If not, see <http://www.gnu.org/licenses/>.
 # vim: sw=2 ai
 
 DNS_SERVERS=$(grep ^nameserver /etc/resolv.conf | cut -d ' ' -f 2 | head -n 1)
@@ -6,6 +23,13 @@ DNS_SEARCH=$(grep ^search /etc/resolv.conf | cut -d ' ' -f 2- | head -n 1)
 GW=$(echo $(echo $IP | rev | cut -d. -f 2- | rev).1)
 
 do_create() {
+  info "Trying to determine Activation Key"
+  AK=$(hammer --output=json hostgroup info --name="$HG" | python -c "import json,sys
+s=json.load(sys.stdin)
+m=filter(lambda a: a['name'] == 'kt_activation_keys', s['Parameters'])
+print reduce(lambda x,y: y['value'], m, '')")
+  check_blank AK
+  warn "AK=$AK"
   info "Creating VM with cloud-init data"
 cat<< EOF >/tmp/x
 <vm>
@@ -56,7 +80,8 @@ runcmd:&#10;
  - ifdown eth0 &#10;
  - ifup eth0 &#10;
  - curl http://$(hostname)/pub/install.sh &gt; /tmp/install.sh &#10;
- - /bin/sh /tmp/install.sh
+ - chmod +x /tmp/install.sh &#10;
+ - ORG='$ORG' AK='$AK' /tmp/install.sh
  </content>
 		</file>
 	       <file>
@@ -121,12 +146,12 @@ local STATE=$( ovirt /vms/$VMS_ID/start -H "Content-type: application/xml" -d @/
   check_blank STATE
   info "Started"
   info "Waiting on host to register"
-  I=10
+  I=20
   while [ $I -gt 0 ] ; do
     local TMP=$( hammer --csv host list --search name=$HOST | tail -n +2)
     [ -n "$TMP" ] && break
     I=$[ $I - 1 ]
-    sleep 5
+    sleep 15
     info "$(date)"
   done
 

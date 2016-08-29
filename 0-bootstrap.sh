@@ -50,7 +50,7 @@ export H h N
 # Input: $dataN - data to output
 # Output: information output
 ninfo() {
-  echo -ne "\e[0;34m#\e[32m" "$@" "$N" 1>&2
+  echo -ne "\e[0;34m#\e[32m" "$@""$N" 1>&2
 }
 
 # Purpose: output information with ANSI
@@ -75,7 +75,7 @@ warn() {
 # Input: $dataN - data to output
 # Output: error output, then exits
 err() {
-  echo -e "\e[1;31mERROR:$h" "$@" >&2
+  echo -e "\e[1;31mERROR:$h" "$@""$N" >&2
   exit 1
 }
 

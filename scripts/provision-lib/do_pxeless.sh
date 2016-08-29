@@ -1,4 +1,21 @@
 #!/bin/sh
+# Satellite-install PXEless provisioning script - to aid in the provisioning of kickstart hosts
+# Copyright (C) 2016  Billy Holmes <billy@gonoph.net>
+# 
+# This file is part of Satellite-install.
+# 
+# Satellite-install is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+# 
+# Satellite-install is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# Satellite-install.  If not, see <http://www.gnu.org/licenses/>.
 #vim: sw=2 ai
 
 do_action() {
@@ -18,7 +35,7 @@ do_action() {
 
   info "Creating PXEless Discovery VM: $NAME"
   cat<< EOF >/tmp/x
-  <vm><name>${NAME}</name><template><name>Blank</name></template><cluster><name>${RHEVM_CLUSTER}</name></cluster><display><type>VNC</type></display><os type="rhel_7x64"><boot dev="hd"/><boot dev="cdrom"/></os><type>server</type></vm>
+  <vm><name>${NAME}</name><template><name>Blank</name></template><cluster><name>${RHEVM_CLUSTER}</name></cluster><memory>2147483648</memory><cpu><topology sockets="2" cores="1" threads="1"/><architecture>X86_64</architecture></cpu><display><type>VNC</type></display><os type="rhel_7x64"><boot dev="hd"/><boot dev="cdrom"/></os><type>server</type></vm>
 EOF
   local VMS_ID=$(ovirt /vms -H "Content-type: application/xml" -d @/tmp/x | grep vm.href | grep id= | sed 's/^.* id="\(.*\)".*$/\1/')
   warn "VMS_ID=$VMS_ID"

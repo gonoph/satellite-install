@@ -52,7 +52,7 @@ ovirt() {
   add_url="$1"
   shift
   rm -f /tmp/l
-  curl -s --basic -k -u ${PW} -H "filter: true" ${URL}${add_url} "$@" | tee /tmp/l
+  curl -s --basic -k -u ${PW} -H "Version: 3" -H "Accept: text/html,application/xml" -H "filter: true" ${URL}${add_url} "$@" | tee /tmp/l
   rm -f /tmp/x
 }
 

@@ -163,6 +163,11 @@ local STATE=$( ovirt /vms/$VMS_ID/start -H "Content-type: application/xml" -d @/
   fi
   info "Updating $HOST to Host Group: $H$HG"
   hammer host update --hostgroup="$HG" --name $HOST --managed yes
+  if [ $? -ne 0 ] ; then
+    warn "That's weird, shouldn't have given an error. Let's try that again."
+    info "Updating $HOST to Host Group: $H$HG"
+    hammer host update --hostgroup="$HG" --name $HOST --managed yes
+  fi
 }
 
 do_action() {

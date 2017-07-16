@@ -337,7 +337,7 @@ fix_ip() {
     warn "Old ip and current ip don't match, setting ip to old ip: [$H$OLDIP/$MASK$h]"
     local ipv4_method=$(nmcli -t c show $NM_UUID | grep ipv4.method | cut -d: -f 2 )
     if [ "$ipv4_method" = "auto" ] ; then
-        local DNS=$(nmcli -t c show $NM_UUID | grep ' domain_name_servers' | cut -d= -f 2 | cut -d' ' -f 2- | tr ' ' ,)
+        local DNS=$(nmcli -t c show $NM_UUID | grep ':domain_name_servers' | cut -d= -f 2 | cut -d' ' -f 2- | tr ' ' ,)
         local SEARCH=$( awk '/^search / {print $2}' /etc/resolv.conf)
         local GW=$( nmcli -t c show $NM_UUID | grep ':routers' | cut -d= -f 2 | tr -d ' ')
         nmcli c modify $NM_UUID ipv4.method manual +ipv4.addresses "$OLDIP/$MASK" ipv4.dns "$DNS" ipv4.dns-search "$SEARCH" ipv4.gateway "$GW"

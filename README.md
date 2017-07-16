@@ -41,9 +41,9 @@ Environment variables steps:
 2. Set these ENV variables:
 
     export RHN_ACTIVATION_KEY
-    # then
+    *then*
     export RHN_ORG_ID
-    # _or_
+    *or*
     export RHN_USER RHN_PASS
 
 3. If you're using the `RHN_USER`, a helper script will find the ORG

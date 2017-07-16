@@ -12,14 +12,10 @@ In the *scripts* directory is a collection of scripts used to help the pre-insta
 
 ### The bootstrap
 
-First, clone the repo to your workstation:
+Transfer the boostrap to your server:
 
-    git clone https://github.com/gonoph/satellite-install.git
-    cd satellite-install
-
-Now, copy the bootstrap script to your server:
-
-    scp 0-bootstrap.sh sat-62:/tmp
+    cd ~
+    curl https://raw.githubusercontent.com/gonoph/satellite-install/master/0-bootstrap.sh -O
 
 Next, there are three ways to register the server:
 

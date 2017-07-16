@@ -27,25 +27,18 @@ To use either option, run the script, and it will tell you which environment set
 
 The server's hostname is treated differently based on the above:
 
-1. If you use the activation key, then the hostname will be the name that your server uses to register - don't keep it *localhost*.
+1. If you use the activation key, then the hostname will be the name that your server uses to register - don't keep it **localhost**.
 2. If you use an existing system UUID, the script will automatically set the hostname to the name of the registered system that belongs to that UUID.
 3. If you lookup the UUID, the script will use the current hostname and attempt to match it based on the systems in your account in the portal.
 
-Therefore, the *ONLY* reason you would *NOT* set the hostname manually, would be if you use scenario (2) to register the server.
+Therefore, the **ONLY** reason you would *NOT* set the hostname manually, would be if you use scenario (2) to register the server.
 
 Environment variables steps:
 
 #### REGISTER BY ACTIVATION KEY
 
 1. Setup an activation key via: <https://access.redhat.com/management/activation_keys>
-2. Set these ENV variables:
-
-    export RHN_ACTIVATION_KEY
-    *then*
-    export RHN_ORG_ID
-    *or*
-    export RHN_USER RHN_PASS
-
+2. Set these ENV variables: `export RHN_ACTIVATION_KEY RHN_ORG_ID **or** RHN_USER RHN_PASS`
 3. If you're using the `RHN_USER`, a helper script will find the ORG
 4. Run the script
 
@@ -53,19 +46,13 @@ Environment variables steps:
 1. Log into the portal: <https://access.redhat.com/management/consumers?type=system>
 2. Find the old system, copy it's UUID (ex: ad88c818-7777-4370-8878-2f1315f7177a)
 3. -or- create(register) a new system in the portal, attach the *Satellite Subscription*, and copy it's UUID.
-4. Set these ENV variables:
-
-    export RHN_USER RHN_PASS
-    export RHN_OLD_SYSTEM=ad88c818-7777-4370-8878-2f1315f7177a`
+4. Set these ENV variables: `export RHN_USER RHN_PASS RHN_OLD_SYSTEM=ad88c818-7777-4370-8878-2f1315f7177a`
 
 5. Run the bootstrap
 
 #### REGISTER VIA UUID BY LOOKING UP OLD UUID BY HOSTNAME
 1. Ensure *hostname* of the system is the same as the previous registration
-2. Set these ENV variables:
-
-    export RHN_USER RHN_PASS
-
+2. Set these ENV variables: `export RHN_USER RHN_PASS`
 3. Run the script
 
 ### To configure the server after the reboot
@@ -84,7 +71,7 @@ You can change these assumptions by editing these files to suit your needs:
 
 ### Using the hammer script
 
-Ater the installation of the server, you will need to further configure it with your manifest, your repos, subnets, sync plans, and a bunch of other things that are outlined in the install guide. To configure a sample version of these things, you can run the *hammer.sh* command which has the following help:
+Ater the installation of the server, you will need to further configure it with your manifest, your repos, subnets, sync plans, and a bunch of other things that are outlined in the install guide. To configure a sample version of these things, you can run the `hammer.sh` command which has the following help:
 
     $ scripts/hammer.sh
     usage: ./scripts/hammer.sh (manifest (FILE) | all | -h | --help | repos | satellite | repos-extra | sync | view | publish | provisioning)
@@ -105,7 +92,7 @@ Here is an example:
 
 ### Provision a system
 
-After all the steps have been ran, you should then be able to provision a system. If you are running RHEV, there is a sample script called *provision* that can help you do this. All it needs to some environment varibles set, or it will use its defaults:
+After all the steps have been ran, you should then be able to provision a system. If you are running RHEV, there is a sample script called `provision` that can help you do this. All it needs to some environment varibles set, or it will use its defaults:
 
     HOST=client1.virt.gonoph.net
     HG=RHEL7-Server

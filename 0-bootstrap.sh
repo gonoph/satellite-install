@@ -253,10 +253,11 @@ $H== REGISTER BY ACTIVATION KEY ==$h
 1) Setup an activation key via: https://access.redhat.com/management/activation_keys
 2) Set these ENV variables:
 
+    export RHN_ACTIVATION_KEY
+    # then
     export RHN_ORG_ID
     # _or_
     export RHN_USER RHN_PASS
-    export RHN_ACTIVATION_KEY
 
 3) If you're using the RHN_USER, a helper script will find the ORG
 

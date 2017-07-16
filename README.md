@@ -24,14 +24,53 @@ Now, copy the bootstrap script to your server:
 Next, there are three ways to register the server:
 
 1. Activiation Key
-2. Use an existing system
-3. Use an existing system, but let the script lookup the UUID from the RHN portal
+2. Use an existing system UUID in the Red Hat portal
+3. Use an existing system, but let the script lookup the UUID from the Red Hat portal
 
-To use either option, run the script, and it will tell you which environment settings to set. As a bonus, if you set the hostname beforehand, the script will automatically set the correct IP address for you. This assumes you are using static IPs. If you are using DHCP, then after the ip address is set, the gateway and DNS will be blank.
+To use either option, run the script, and it will tell you which environment settings to set.
 
-Finally run the script:
+The server's hostname is treated differently based on the above:
 
-    /tmp/0-bootstrap.sh
+1. If you use the activation key, then the hostname will be the name that your server uses to register - don't keep it *localhost*.
+2. If you use an existing system UUID, the script will automatically set the hostname to the name of the registered system that belongs to that UUID.
+3. If you lookup the UUID, the script will use the current hostname and attempt to match it based on the systems in your account in the portal.
+
+Therefore, the *ONLY* reason you would *NOT* set the hostname manually, would be if you use scenario (2) to register the server.
+
+Environment variables steps:
+
+#### REGISTER BY ACTIVATION KEY
+
+1. Setup an activation key via: <https://access.redhat.com/management/activation_keys>
+2. Set these ENV variables:
+
+    export RHN_ACTIVATION_KEY
+    # then
+    export RHN_ORG_ID
+    # _or_
+    export RHN_USER RHN_PASS
+
+3. If you're using the `RHN_USER`, a helper script will find the ORG
+4. Run the script
+
+#### REGISTER VIA UUID
+1. Log into the portal: <https://access.redhat.com/management/consumers?type=system>
+2. Find the old system, copy it's UUID (ex: ad88c818-7777-4370-8878-2f1315f7177a)
+3. -or- create(register) a new system in the portal, attach the *Satellite Subscription*, and copy it's UUID.
+4. Set these ENV variables:
+
+    export RHN_USER RHN_PASS
+    export RHN_OLD_SYSTEM=ad88c818-7777-4370-8878-2f1315f7177a`
+
+5. Run the bootstrap
+
+#### REGISTER VIA UUID BY LOOKING UP OLD UUID BY HOSTNAME
+1. Ensure *hostname* of the system is the same as the previous registration
+2. Set these ENV variables:
+
+    export RHN_USER RHN_PASS
+
+3. Run the script
 
 ### To configure the server after the reboot
 
@@ -43,9 +82,9 @@ After the reboot, you will need to run make to finish setting up the server. My 
 
 You can change these assumptions by editing these files to suit your needs:
 
-1. conf/cli_config.yml.sh
-2. etc/mongod.service.d/blockdev.conf
-3. alternative.conf
+1. `conf/cli_config.yml.sh`
+2. `etc/mongod.service.d/blockdev.conf`
+3. `alternative.conf`
 
 ### Using the hammer script
 
